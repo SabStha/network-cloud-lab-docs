@@ -188,13 +188,25 @@
 
   /* Config checklist */
   .check-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:1px; }
-  .check-list li{ display:flex; align-items:flex-start; gap:10px; padding:9px 10px; border-radius:6px; font-size:13.8px; }
-  .check-list li:hover{ background:var(--surface-2); }
+  .check-list > li{ display:flex; align-items:flex-start; flex-wrap:wrap; gap:10px; padding:9px 10px; border-radius:6px; font-size:13.8px; }
+  .check-list > li:hover{ background:var(--surface-2); }
   .check-list input[type="checkbox"]{ width:16px; height:16px; margin-top:2px; accent-color:var(--ok); flex:none; }
   .check-list label{ cursor:pointer; }
   .check-list label .task-note{ display:block; color:var(--ink-faint); font-size:12px; font-weight:400; margin-top:1px; }
   .check-list input:checked + label{ color:var(--ink-faint); text-decoration:line-through; }
   .check-list input:checked + label .task-note{ text-decoration:none; }
+
+  .howto{ flex-basis:100%; width:100%; margin:2px 0 0 26px; }
+  .howto summary{ list-style:none; cursor:pointer; font-family:var(--font-mono); font-size:11.2px; font-weight:700; color:var(--accent); display:inline-flex; align-items:center; gap:5px; }
+  .howto summary::-webkit-details-marker{ display:none; }
+  .howto summary .hchev{ width:9px; height:9px; transition:transform .15s ease; }
+  .howto[open] summary .hchev{ transform:rotate(90deg); }
+  .howto-body{ margin:8px 0 4px; padding:12px 15px; background:var(--surface-2); border:1px solid var(--line); border-radius:8px; font-size:12.6px; color:var(--ink-soft); }
+  .howto-body ol{ margin:0; padding-left:18px; display:flex; flex-direction:column; gap:6px; }
+  .howto-body li{ display:list-item; padding:0; background:none; border-radius:0; }
+  .howto-body li:hover{ background:none; }
+  .howto-body code{ background:var(--surface-3); padding:1px 5px; border-radius:4px; font-size:11.8px; color:var(--ink); }
+  .howto-body .warn-line{ margin-top:8px; padding-top:8px; border-top:1px dashed var(--line); color:var(--warn); font-size:12px; }
 
   /* Table */
   .table-wrap{ overflow-x:auto; border:1px solid var(--line); border-radius:8px; background:var(--surface); }
@@ -420,10 +432,58 @@
       </div>
 
       <ul class="check-list" data-phase>
-        <li><input type="checkbox" id="p1-1"><label for="p1-1">Create the VPC<span class="task-note">CIDR 10.10.0.0/16 — matches the Phase 2 addressing plan</span></label></li>
-        <li><input type="checkbox" id="p1-2"><label for="p1-2">Create two subnets<span class="task-note">public/WAN 10.10.1.0/24, private/LAN 10.10.20.0/24 (the "Users" subnet from Phase 2)</span></label></li>
-        <li><input type="checkbox" id="p1-3"><label for="p1-3">Attach an Internet Gateway to the VPC<span class="task-note">this is your "ISP router" — create it once, attach it to the VPC</span></label></li>
-        <li><input type="checkbox" id="p1-4"><label for="p1-4">Build the route tables<span class="task-note">public RT: 0.0.0.0/0 → the IGW. private RT: 0.0.0.0/0 → the firewall's LAN network interface</span></label></li>
+        <li>
+          <input type="checkbox" id="p1-1"><label for="p1-1">Create the VPC<span class="task-note">CIDR 10.10.0.0/16 — matches the Phase 2 addressing plan</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>AWS Console → search <strong>VPC</strong> → <strong>Your VPCs</strong> → <strong>Create VPC</strong></li>
+              <li>Resources to create: <strong>VPC only</strong> (not the wizard — build it piece by piece)</li>
+              <li>Name tag: <code>enterprise-lab-vpc</code></li>
+              <li>IPv4 CIDR: <code>10.10.0.0/16</code></li>
+              <li>IPv6 CIDR block: No IPv6 CIDR block · Tenancy: Default</li>
+              <li>Click <strong>Create VPC</strong></li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p1-2"><label for="p1-2">Create two subnets<span class="task-note">public/WAN 10.10.1.0/24, private/LAN 10.10.20.0/24 (the "Users" subnet from Phase 2)</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>VPC Console → <strong>Subnets</strong> → <strong>Create subnet</strong></li>
+              <li>VPC ID: select <code>enterprise-lab-vpc</code></li>
+              <li>Subnet 1 — Name <code>public-wan</code>, Availability Zone: any (e.g. <code>us-east-1a</code>), IPv4 CIDR <code>10.10.1.0/24</code></li>
+              <li>Click <strong>Add new subnet</strong></li>
+              <li>Subnet 2 — Name <code>private-lan</code>, same or a different AZ, IPv4 CIDR <code>10.10.20.0/24</code></li>
+              <li>Click <strong>Create subnet</strong></li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p1-3"><label for="p1-3">Attach an Internet Gateway to the VPC<span class="task-note">this is your "ISP router" — create it once, attach it to the VPC</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>VPC Console → <strong>Internet Gateways</strong> → <strong>Create internet gateway</strong></li>
+              <li>Name tag: <code>enterprise-lab-igw</code> → <strong>Create internet gateway</strong></li>
+              <li>It shows as "Detached" — select it → <strong>Actions → Attach to VPC</strong></li>
+              <li>Choose <code>enterprise-lab-vpc</code> → <strong>Attach internet gateway</strong></li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p1-4"><label for="p1-4">Build the route tables<span class="task-note">public RT: 0.0.0.0/0 → the IGW. private RT: 0.0.0.0/0 → the firewall's LAN network interface</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>VPC Console → <strong>Route Tables</strong> → <strong>Create route table</strong></li>
+              <li><strong>Public:</strong> Name <code>public-rt</code>, VPC <code>enterprise-lab-vpc</code> → Create</li>
+              <li>Select it → <strong>Routes</strong> tab → Edit routes → Add route: Destination <code>0.0.0.0/0</code>, Target → Internet Gateway → <code>enterprise-lab-igw</code> → Save</li>
+              <li><strong>Subnet associations</strong> tab → Edit → check <code>public-wan</code> → Save</li>
+              <li><strong>Private:</strong> Name <code>private-rt</code>, same VPC → Create</li>
+              <li><strong>Subnet associations</strong> tab → Edit → check <code>private-lan</code> → Save</li>
+            </ol>
+            <div class="warn-line">⚠ Leave its 0.0.0.0/0 route for now — it needs to point at the firewall's LAN network interface, which doesn't exist until Step 5. Come back after that.</div>
+            </div>
+          </details>
+        </li>
         <li><input type="checkbox" id="p1-5"><label for="p1-5">Launch the Palo Alto VM-Series firewall<span class="task-note">AWS Marketplace → "Palo Alto Networks VM-Series" → an instance size PAN-OS supports (e.g. m5.xlarge)</span></label></li>
         <li><input type="checkbox" id="p1-6"><label for="p1-6">Attach 3 network interfaces to the firewall<span class="task-note">management (admin access), untrust/WAN (public subnet), trust/LAN (private subnet)</span></label></li>
         <li><input type="checkbox" id="p1-7"><label for="p1-7">Allocate an Elastic IP and associate it with the untrust interface<span class="task-note">this stands in for 203.0.113.2 from the design — AWS assigns the real public address</span></label></li>
