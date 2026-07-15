@@ -375,7 +375,7 @@
       <span class="ph-icon"><svg class="icon"><use href="#i-router"/></svg></span>
       <span class="ph-meta"><span class="ph-eyebrow">Phase 01</span><span class="ph-title">Network Architecture</span></span>
       <span class="ph-oneliner">The simplest version of the network that gets everyone safely online.</span>
-      <span class="status-chip st-ref">Reference</span>
+      <span class="status-chip st-todo" data-status>Not started</span>
       <svg class="icon chev"><use href="#i-check"/></svg>
     </summary>
     <div class="phase-body">
@@ -403,6 +403,38 @@
         </svg>
         <div class="diagram-caption">Internet → ISP Router → Firewall → Office LAN</div>
       </div>
+
+      <div class="subhead">How to build this — AWS lab</div>
+      <p class="lead">You don't have physical hardware, so this v1 topology gets built with EC2 instances inside a VPC instead. Every box in the diagram above maps to a real AWS resource.</p>
+
+      <div class="why-box"><strong>Where did the ISP router go?</strong>In AWS you don't deploy an "ISP router" yourself — an Internet Gateway (IGW) attached to your VPC plays that role. AWS manages that hop for you; you just need a route pointing at it.</div>
+
+      <div class="table-wrap" style="margin:14px 0 18px;">
+        <table><thead><tr><th>Diagram box</th><th>AWS resource</th></tr></thead>
+        <tbody>
+          <tr><td>Internet</td><td>Public internet, reached via the VPC's Internet Gateway</td></tr>
+          <tr><td>ISP Router · 203.0.113.1/30</td><td>Internet Gateway (IGW) + public route table</td></tr>
+          <tr><td>Palo Alto Firewall · 203.0.113.2/30</td><td>VM-Series EC2 instance (AWS Marketplace), Elastic IP on its untrust ENI</td></tr>
+          <tr><td>PC-1</td><td>A small EC2 instance in the private/LAN subnet, no public IP</td></tr>
+        </tbody></table>
+      </div>
+
+      <ul class="check-list" data-phase>
+        <li><input type="checkbox" id="p1-1"><label for="p1-1">Create the VPC<span class="task-note">CIDR 10.10.0.0/16 — matches the Phase 2 addressing plan</span></label></li>
+        <li><input type="checkbox" id="p1-2"><label for="p1-2">Create two subnets<span class="task-note">public/WAN 10.10.1.0/24, private/LAN 10.10.20.0/24 (the "Users" subnet from Phase 2)</span></label></li>
+        <li><input type="checkbox" id="p1-3"><label for="p1-3">Attach an Internet Gateway to the VPC<span class="task-note">this is your "ISP router" — create it once, attach it to the VPC</span></label></li>
+        <li><input type="checkbox" id="p1-4"><label for="p1-4">Build the route tables<span class="task-note">public RT: 0.0.0.0/0 → the IGW. private RT: 0.0.0.0/0 → the firewall's LAN network interface</span></label></li>
+        <li><input type="checkbox" id="p1-5"><label for="p1-5">Launch the Palo Alto VM-Series firewall<span class="task-note">AWS Marketplace → "Palo Alto Networks VM-Series" → an instance size PAN-OS supports (e.g. m5.xlarge)</span></label></li>
+        <li><input type="checkbox" id="p1-6"><label for="p1-6">Attach 3 network interfaces to the firewall<span class="task-note">management (admin access), untrust/WAN (public subnet), trust/LAN (private subnet)</span></label></li>
+        <li><input type="checkbox" id="p1-7"><label for="p1-7">Allocate an Elastic IP and associate it with the untrust interface<span class="task-note">this stands in for 203.0.113.2 from the design — AWS assigns the real public address</span></label></li>
+        <li><input type="checkbox" id="p1-8"><label for="p1-8">Disable "source/destination check" on the trust interface<span class="task-note">required so the firewall can forward traffic that isn't addressed to itself — AWS blocks this by default</span></label></li>
+        <li><input type="checkbox" id="p1-9"><label for="p1-9">Open security groups<span class="task-note">management SG: your IP → HTTPS/SSH only. data-plane SGs: allow all — PAN-OS does the actual filtering, not the AWS SG</span></label></li>
+        <li><input type="checkbox" id="p1-10"><label for="p1-10">Log into PAN-OS at https://&lt;management EIP&gt; and configure interfaces, zones, virtual router, default route, and NAT<span class="task-note">this is the Phase 4 checklist, pointed at your AWS addresses instead of the on-prem plan</span></label></li>
+        <li><input type="checkbox" id="p1-11"><label for="p1-11">Launch PC-1<span class="task-note">EC2 instance in the private/LAN subnet, no public IP — its only way out is through the firewall</span></label></li>
+      </ul>
+
+      <div class="subhead" style="margin-top:26px;">Validation tests</div>
+      <div class="term"><span class="c2">$</span> aws ssm start-session --target &lt;PC-1 instance-id&gt; <span class="c1">\\ PC-1 has no public IP, connect via Session Manager</span><br><span class="c2">$</span> ping 8.8.8.8<br><span class="c3">#</span> confirm the request shows up in PAN-OS Traffic Monitor as <span class="c1">allow</span></div>
     </div>
   </details>
 
