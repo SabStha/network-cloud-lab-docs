@@ -419,6 +419,8 @@
       <div class="subhead">How to build this — AWS lab</div>
       <p class="lead">You don't have physical hardware, so this v1 topology gets built with EC2 instances inside a VPC instead. Every box in the diagram above maps to a real AWS resource.</p>
 
+      <div class="why-box"><strong>Why build the VPC before launching any EC2 instances?</strong>They're not alternatives — EC2 is the computer, the VPC is the room it sits in. Every EC2 instance has to be launched into a subnet, and a subnet only exists inside a VPC, so there's no way to skip straight to "just launch EC2." AWS does give every account a flat, fully-public "default VPC" you could launch into instead — but that has no segmentation at all, which would defeat the point of this whole project. Build the network first, then move the firewall and PC-1 into it.</div>
+
       <div class="why-box"><strong>Where did the ISP router go?</strong>In AWS you don't deploy an "ISP router" yourself — an Internet Gateway (IGW) attached to your VPC plays that role. It isn't your home/office internet router either; that's outside this topology entirely, it's just how your laptop reaches the AWS Console. The IGW is virtual, free, and needed from the very start of Phase 1 — without it the VPC has no path to the internet at all, so nothing else in this phase can be tested.</div>
 
       <div class="table-wrap" style="margin:14px 0 18px;">
