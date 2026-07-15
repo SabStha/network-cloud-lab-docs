@@ -22,6 +22,12 @@
     --warn:#b8860b; --warn-soft:rgba(184,134,11,0.13);
     --danger:#c0392b;
     --neutral-soft:rgba(75,85,99,0.10);
+    --cat-network:#2f6fd1; --cat-network-soft:rgba(47,111,209,0.12);
+    --cat-security:#d1392f; --cat-security-soft:rgba(209,57,47,0.12);
+    --cat-cloud:#e08a2c; --cat-cloud-soft:rgba(224,138,44,0.13);
+    --cat-database:#1596ac; --cat-database-soft:rgba(21,150,172,0.12);
+    --cat-devops:#b8932a; --cat-devops-soft:rgba(184,147,42,0.14);
+    --cat-monitoring:#c23b8f; --cat-monitoring-soft:rgba(194,59,143,0.12);
     --shadow:0 1px 2px rgba(17,24,39,0.06), 0 8px 20px -12px rgba(17,24,39,0.16);
     --font-display:-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
     --font-body:-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
@@ -42,6 +48,12 @@
       --why:#c39bde; --why-soft:rgba(195,155,222,0.12);
       --ok:#4ecb8c; --ok-soft:rgba(78,203,140,0.14); --warn:#dba83f; --warn-soft:rgba(219,168,63,0.16); --danger:#e2685c;
       --neutral-soft:rgba(163,173,186,0.12);
+      --cat-network:#6fa8ea; --cat-network-soft:rgba(111,168,234,0.16);
+      --cat-security:#e2685c; --cat-security-soft:rgba(226,104,92,0.16);
+      --cat-cloud:#eba55a; --cat-cloud-soft:rgba(235,165,90,0.16);
+      --cat-database:#4fc7dc; --cat-database-soft:rgba(79,199,220,0.16);
+      --cat-devops:#dba83f; --cat-devops-soft:rgba(219,168,63,0.16);
+      --cat-monitoring:#e07fc0; --cat-monitoring-soft:rgba(224,127,192,0.16);
       --shadow:0 1px 2px rgba(0,0,0,0.35), 0 8px 20px -12px rgba(0,0,0,0.5);
     }
   }
@@ -56,6 +68,12 @@
     --why:#c39bde; --why-soft:rgba(195,155,222,0.12);
     --ok:#4ecb8c; --ok-soft:rgba(78,203,140,0.14); --warn:#dba83f; --warn-soft:rgba(219,168,63,0.16); --danger:#e2685c;
     --neutral-soft:rgba(163,173,186,0.12);
+    --cat-network:#6fa8ea; --cat-network-soft:rgba(111,168,234,0.16);
+    --cat-security:#e2685c; --cat-security-soft:rgba(226,104,92,0.16);
+    --cat-cloud:#eba55a; --cat-cloud-soft:rgba(235,165,90,0.16);
+    --cat-database:#4fc7dc; --cat-database-soft:rgba(79,199,220,0.16);
+    --cat-devops:#dba83f; --cat-devops-soft:rgba(219,168,63,0.16);
+    --cat-monitoring:#e07fc0; --cat-monitoring-soft:rgba(224,127,192,0.16);
     --shadow:0 1px 2px rgba(0,0,0,0.35), 0 8px 20px -12px rgba(0,0,0,0.5);
   }
   :root[data-theme="light"]{
@@ -69,6 +87,12 @@
     --why:#8a5cb0; --why-soft:rgba(138,92,176,0.09);
     --ok:#1c8a54; --ok-soft:rgba(28,138,84,0.12); --warn:#b8860b; --warn-soft:rgba(184,134,11,0.13); --danger:#c0392b;
     --neutral-soft:rgba(75,85,99,0.10);
+    --cat-network:#2f6fd1; --cat-network-soft:rgba(47,111,209,0.12);
+    --cat-security:#d1392f; --cat-security-soft:rgba(209,57,47,0.12);
+    --cat-cloud:#e08a2c; --cat-cloud-soft:rgba(224,138,44,0.13);
+    --cat-database:#1596ac; --cat-database-soft:rgba(21,150,172,0.12);
+    --cat-devops:#b8932a; --cat-devops-soft:rgba(184,147,42,0.14);
+    --cat-monitoring:#c23b8f; --cat-monitoring-soft:rgba(194,59,143,0.12);
     --shadow:0 1px 2px rgba(17,24,39,0.06), 0 8px 20px -12px rgba(17,24,39,0.16);
   }
 
@@ -304,6 +328,92 @@
   @keyframes flowdash{ to{ stroke-dashoffset:-22; } }
   @media (prefers-reduced-motion: reduce){ .dg .wire-vpn{ animation:none; } }
 
+  /* ================= EXPLAINER (understand in 30 seconds) ================= */
+  .explainer{ max-width:1100px; margin:0 auto; padding:0 24px; }
+  .xsection{ padding:54px 0; border-bottom:1px solid var(--line); }
+  .xsection:first-child{ padding-top:38px; }
+  .xhead{ text-align:center; max-width:600px; margin:0 auto 30px; }
+  .xeyebrow{ font-family:var(--font-mono); font-size:10.8px; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; }
+  .xhead h2{ font-size:25px; }
+  .xhead p{ color:var(--ink-soft); font-size:14.5px; margin-top:8px; }
+
+  .cat-legend{ display:flex; flex-wrap:wrap; justify-content:center; gap:8px 14px; margin:18px 0 6px; }
+  .cat-chip{ display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:11px; font-weight:700; color:var(--ink-soft); }
+  .cat-dot{ width:9px; height:9px; border-radius:50%; background:var(--nc); flex:none; }
+
+  /* Interactive architecture chain */
+  .arch-wrap{ background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:26px 10px 22px; box-shadow:var(--shadow); }
+  .arch-chain{ display:flex; align-items:center; overflow-x:auto; gap:0; padding:6px 10px 18px; -webkit-overflow-scrolling:touch; }
+  .arch-node{ all:unset; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; gap:7px; background:var(--surface-2); border:2px solid var(--line); border-radius:14px; padding:13px 14px; cursor:pointer; flex:none; min-width:78px; text-align:center; transition:transform .2s cubic-bezier(.16,.8,.24,1), border-color .2s ease, background .2s ease, box-shadow .2s ease; }
+  .arch-node .icon{ width:24px; height:24px; color:var(--nc); }
+  .arch-node span{ font-size:10.5px; font-weight:700; color:var(--ink); line-height:1.25; }
+  .arch-node:hover{ transform:translateY(-2px); border-color:var(--nc); }
+  .arch-node:focus-visible{ outline:2px solid var(--nc); outline-offset:2px; }
+  .arch-node.active{ border-color:var(--nc); background:var(--nc-soft); transform:translateY(-4px); box-shadow:0 10px 22px -10px rgba(0,0,0,0.28); }
+  .arch-wire{ flex:none; width:26px; height:2px; background:var(--line-strong); position:relative; margin:0 1px; }
+  .arch-wire::after{ content:""; position:absolute; top:-2.5px; left:0; width:7px; height:7px; border-radius:50%; background:var(--accent); animation:flowdot 1.7s linear infinite; }
+  @keyframes flowdot{ 0%{ left:0; opacity:0; } 12%{ opacity:1; } 88%{ opacity:1; } 100%{ left:calc(100% - 7px); opacity:0; } }
+  @media (prefers-reduced-motion: reduce){ .arch-wire::after{ animation:none; opacity:0.6; left:calc(50% - 3.5px); } }
+  .arch-panel{ margin-top:8px; padding:18px 20px; background:var(--nc-soft, var(--surface-2)); border-radius:12px; min-height:88px; transition:background .25s ease; }
+  .arch-panel .xcat{ font-family:var(--font-mono); font-size:10.3px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--nc, var(--ink-faint)); margin-bottom:5px; }
+  .arch-panel h3{ font-size:16.5px; margin-bottom:5px; }
+  .arch-panel p{ color:var(--ink-soft); font-size:13.6px; margin:0; max-width:60ch; }
+
+  /* Metaphor cards */
+  .metaphor-card{ background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:20px 18px; box-shadow:var(--shadow); text-align:center; }
+  .metaphor-card .micon{ width:44px; height:44px; border-radius:12px; background:var(--nc-soft); color:var(--nc); display:flex; align-items:center; justify-content:center; margin:0 auto 12px; }
+  .metaphor-card .micon .icon{ width:24px; height:24px; }
+  .metaphor-card h4{ font-size:14.5px; margin-bottom:6px; }
+  .metaphor-card .mreal{ font-family:var(--font-mono); font-size:10.3px; color:var(--nc); text-transform:uppercase; letter-spacing:0.04em; margin-top:8px; }
+  .metaphor-card p{ color:var(--ink-soft); font-size:13.2px; margin:0; }
+
+  /* Tech cards */
+  .tech-card{ background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:18px 18px 16px; box-shadow:var(--shadow); }
+  .tech-card-top{ display:flex; align-items:center; gap:11px; margin-bottom:12px; }
+  .tech-card-icon{ width:38px; height:38px; border-radius:10px; background:var(--nc-soft); color:var(--nc); display:flex; align-items:center; justify-content:center; flex:none; }
+  .tech-card-icon .icon{ width:20px; height:20px; }
+  .tech-card-top h4{ font-size:14.5px; margin:0; }
+  .tech-cat-tag{ font-family:var(--font-mono); font-size:9.5px; font-weight:700; color:var(--nc); text-transform:uppercase; letter-spacing:0.05em; }
+  .tech-row{ display:flex; gap:8px; padding:6px 0; border-top:1px dashed var(--line); font-size:12.6px; }
+  .tech-row .tk{ flex:none; width:64px; font-family:var(--font-mono); font-size:9.8px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.03em; padding-top:1px; }
+  .tech-row .tv{ color:var(--ink-soft); }
+
+  /* Compare (before/after) */
+  .compare{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:640px){ .compare{ grid-template-columns:1fr; } }
+  .compare-col{ border-radius:12px; padding:16px 18px; }
+  .compare-col.without{ background:var(--zone-untrust-soft); border:1px solid var(--zone-untrust); }
+  .compare-col.with{ background:var(--zone-trust-soft); border:1px solid var(--zone-trust); }
+  .compare-col .clabel{ font-family:var(--font-mono); font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:9px; }
+  .compare-col.without .clabel{ color:var(--zone-untrust); }
+  .compare-col.with .clabel{ color:var(--zone-trust); }
+  .compare-col ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px; }
+  .compare-col li{ font-size:13.2px; color:var(--ink); display:flex; gap:8px; align-items:flex-start; }
+  .compare-block{ margin-bottom:14px; }
+  .compare-block:last-child{ margin-bottom:0; }
+  .compare-title{ font-weight:700; font-size:14.5px; margin-bottom:10px; text-align:center; }
+
+  /* Horizontal timeline */
+  .xtimeline{ display:flex; align-items:flex-start; overflow-x:auto; gap:0; padding:8px 6px 18px; }
+  .xt-stop{ flex:none; width:112px; text-align:center; text-decoration:none; color:inherit; padding:4px; border-radius:10px; transition:background .15s ease; }
+  .xt-stop:hover{ background:var(--surface-2); }
+  .xt-dot{ width:34px; height:34px; border-radius:50%; background:var(--nc-soft); color:var(--nc); display:flex; align-items:center; justify-content:center; margin:0 auto 8px; border:2px solid var(--nc); }
+  .xt-dot .icon{ width:16px; height:16px; }
+  .xt-stop .xt-label{ font-size:11.5px; font-weight:700; color:var(--ink); }
+  .xt-wire{ flex:none; width:22px; height:2px; background:var(--line-strong); margin-top:17px; }
+
+  .x-cta{ text-align:center; padding:44px 20px 10px; }
+  .x-cta-btn{ display:inline-flex; align-items:center; gap:8px; background:var(--accent); color:#fff; font-weight:700; font-size:14px; padding:13px 26px; border-radius:999px; text-decoration:none; transition:transform .18s ease, box-shadow .18s ease; box-shadow:0 8px 20px -8px var(--accent-soft); }
+  .x-cta-btn:hover{ transform:translateY(-2px); }
+  .x-cta-sub{ margin-top:10px; font-size:12.5px; color:var(--ink-faint); }
+
+  @media (max-width:600px){
+    .explainer{ padding:0 16px; }
+    .xsection{ padding:38px 0; }
+    .xhead h2{ font-size:21px; }
+    .arch-node{ min-width:66px; padding:10px 10px; }
+  }
+
   /* Per-task inline illustration (visible by default, not hidden in a toggle) */
   .step-illustration{ flex-basis:100%; width:100%; margin:8px 0 2px 26px; max-width:230px; }
   .step-illustration .diagram-panel{ padding:10px 6px 8px; }
@@ -351,6 +461,11 @@
   <symbol id="i-clipboard" viewBox="0 0 24 24"><path d="M9 3.5h6a1 1 0 0 1 1 1V6h2a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h2V4.5a1 1 0 0 1 1-1z"/><path d="M9 4.5h6"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
   <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M8 12a4 4 0 1 1 8 0c0 1.8-1 2.6-1.6 3.3-.4.5-.4.9-.4 1.7H10c0-.8 0-1.2-.4-1.7C9 14.6 8 13.8 8 12z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c0-3.6 3.2-6.2 7.5-6.2s7.5 2.6 7.5 6.2"/></symbol>
+  <symbol id="i-guard" viewBox="0 0 24 24"><path d="M12 21s7.5-3.5 7.5-9.5V5L12 2 4.5 5v6.5C4.5 17.5 12 21 12 21z"/><circle cx="12" cy="10" r="2.2"/><path d="M8.3 15c.8-1.6 2.1-2.4 3.7-2.4s2.9.8 3.7 2.4"/></symbol>
+  <symbol id="i-fence" viewBox="0 0 24 24"><path d="M4 21V7l3-3 3 3v14M11 21V7l3-3 3 3v14M18 21V7l3-3v17"/><path d="M2 12h20M2 17h20"/></symbol>
+  <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M2 12h4.5l2-7 4 14 2-7H22"/></symbol>
+  <symbol id="i-tunnel" viewBox="0 0 24 24"><path d="M3 20V11a9 9 0 0 1 18 0v9"/><path d="M3 20h4M17 20h4M8 20v-6a4 4 0 0 1 8 0v6"/></symbol>
 </defs>
 </svg>
 
@@ -358,6 +473,197 @@
   <div class="brand"><span class="brand-mark">NW</span><span>Enterprise Network → Hybrid Cloud<br><small>Infrastructure Console</small></span></div>
   <div class="topbar-spacer"></div>
   <span class="theme-note">Example Corp · Design Build</span>
+</div>
+
+<div class="explainer">
+
+  <!-- 1. WHAT IS THIS -->
+  <section class="xsection">
+    <div class="xhead">
+      <div class="xeyebrow">Understand this in 30 seconds</div>
+      <h2>One company. One network. Grown up in public.</h2>
+      <p>A 50-person company starts with a single locked-down office, and step by step grows a branch office, an encrypted tunnel between them, and a slice of AWS — every piece labeled below by what it actually does.</p>
+    </div>
+    <div class="cat-legend">
+      <span class="cat-chip"><span class="cat-dot" style="--nc:var(--cat-network)"></span>Networking</span>
+      <span class="cat-chip"><span class="cat-dot" style="--nc:var(--cat-security)"></span>Security</span>
+      <span class="cat-chip"><span class="cat-dot" style="--nc:var(--cat-cloud)"></span>Cloud</span>
+      <span class="cat-chip"><span class="cat-dot" style="--nc:var(--cat-database)"></span>Database</span>
+      <span class="cat-chip"><span class="cat-dot" style="--nc:var(--cat-devops)"></span>DevOps</span>
+      <span class="cat-chip"><span class="cat-dot" style="--nc:var(--cat-monitoring)"></span>Monitoring</span>
+    </div>
+
+    <div class="arch-wrap">
+      <div class="arch-chain" role="list" aria-label="Click each step to see what it does">
+        <button class="arch-node active" style="--nc:var(--cat-network); --nc-soft:var(--cat-network-soft);" data-cat="Networking" data-title="👤 You" data-desc="That's you — at your laptop, building and testing everything through the AWS Console." aria-pressed="true"><svg class="icon"><use href="#i-user"/></svg><span>You</span></button>
+        <span class="arch-wire"></span>
+        <button class="arch-node" style="--nc:var(--cat-network); --nc-soft:var(--cat-network-soft);" data-cat="Networking" data-title="🌍 Internet" data-desc="The open public internet — untrusted by default. Nothing from here gets in unless a rule explicitly allows it."><svg class="icon"><use href="#i-cloud"/></svg><span>Internet</span></button>
+        <span class="arch-wire"></span>
+        <button class="arch-node" style="--nc:var(--cat-network); --nc-soft:var(--cat-network-soft);" data-cat="Networking" data-title="📡 Internet Gateway" data-desc="AWS's front door for the whole network — replaces a physical ISP router. One door, in or out."><svg class="icon"><use href="#i-router"/></svg><span>Gateway</span></button>
+        <span class="arch-wire"></span>
+        <button class="arch-node" style="--nc:var(--cat-security); --nc-soft:var(--cat-security-soft);" data-cat="Security" data-title="🛡️ Palo Alto Firewall" data-desc="Every packet gets inspected here first. Nothing reaches the inside without explicit permission."><svg class="icon"><use href="#i-shield"/></svg><span>Firewall</span></button>
+        <span class="arch-wire"></span>
+        <button class="arch-node" style="--nc:var(--cat-network); --nc-soft:var(--cat-network-soft);" data-cat="Networking" data-title="🔀 VPC" data-desc="A fenced-off piece of AWS that's entirely yours — 10.10.0.0/16, isolated from every other AWS customer."><svg class="icon"><use href="#i-fence"/></svg><span>VPC</span></button>
+        <span class="arch-wire"></span>
+        <button class="arch-node" style="--nc:var(--cat-network); --nc-soft:var(--cat-network-soft);" data-cat="Networking" data-title="🧩 Subnet" data-desc="Smaller rooms inside the fence — some face the street (public), some never do (private)."><svg class="icon"><use href="#i-grid"/></svg><span>Subnet</span></button>
+        <span class="arch-wire"></span>
+        <button class="arch-node" style="--nc:var(--cat-cloud); --nc-soft:var(--cat-cloud-soft);" data-cat="Cloud" data-title="🖥️ EC2" data-desc="The actual computers living inside those rooms — the firewall itself, and PC-1, a simulated office desktop."><svg class="icon"><use href="#i-monitor"/></svg><span>EC2</span></button>
+        <span class="arch-wire"></span>
+        <button class="arch-node" style="--nc:var(--cat-security); --nc-soft:var(--cat-security-soft);" data-cat="Security" data-title="🔐 VPN Tunnel" data-desc="A private, encrypted tunnel dug under the public internet, connecting HQ to a branch office."><svg class="icon"><use href="#i-tunnel"/></svg><span>VPN</span></button>
+        <span class="arch-wire"></span>
+        <button class="arch-node" style="--nc:var(--cat-database); --nc-soft:var(--cat-database-soft);" data-cat="Database" data-title="☁️ AWS Cloud" data-desc="The same trust boundary, extended into AWS — EC2 servers and a private database, reachable only through the tunnel."><svg class="icon"><use href="#i-database"/></svg><span>AWS</span></button>
+        <span class="arch-wire"></span>
+        <button class="arch-node" style="--nc:var(--cat-monitoring); --nc-soft:var(--cat-monitoring-soft);" data-cat="Monitoring" data-title="📊 Monitoring" data-desc="Every allow, every block, every login — logged and watched, so nothing happens invisibly."><svg class="icon"><use href="#i-pulse"/></svg><span>Monitor</span></button>
+      </div>
+      <div class="arch-panel" id="archPanel" style="--nc:var(--cat-network); --nc-soft:var(--cat-network-soft); background:var(--nc-soft);" aria-live="polite">
+        <div class="xcat" id="archCat">Networking</div>
+        <h3 id="archTitle">👤 You</h3>
+        <p id="archDesc">That's you — at your laptop, building and testing everything through the AWS Console. Click any step above to see what it does.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. METAPHORS -->
+  <section class="xsection">
+    <div class="xhead">
+      <div class="xeyebrow">In plain terms</div>
+      <h2>Four ideas that explain most of it</h2>
+      <p>The real names are jargon. The concepts underneath are things you already understand.</p>
+    </div>
+    <div class="grid grid-4">
+      <div class="metaphor-card"><div class="micon" style="--nc:var(--cat-network); --nc-soft:var(--cat-network-soft);"><svg class="icon"><use href="#i-fence"/></svg></div><h4>The VPC is a fence</h4><p>Nothing outside your fenced-off land can see or touch what's inside — unless you build a gate.</p><div class="mreal" style="--nc:var(--cat-network);">= Amazon VPC</div></div>
+      <div class="metaphor-card"><div class="micon" style="--nc:var(--cat-security); --nc-soft:var(--cat-security-soft);"><svg class="icon"><use href="#i-guard"/></svg></div><h4>The Firewall is a guard</h4><p>Checks every packet's ID before deciding whether it's allowed through.</p><div class="mreal" style="--nc:var(--cat-security);">= Palo Alto NGFW</div></div>
+      <div class="metaphor-card"><div class="micon" style="--nc:var(--cat-security); --nc-soft:var(--cat-security-soft);"><svg class="icon"><use href="#i-lock"/></svg></div><h4>Security Groups are a guest list</h4><p>Only traffic that's explicitly invited gets past the gate. Everyone else is turned away.</p><div class="mreal" style="--nc:var(--cat-security);">= AWS Security Groups</div></div>
+      <div class="metaphor-card"><div class="micon" style="--nc:var(--cat-security); --nc-soft:var(--cat-security-soft);"><svg class="icon"><use href="#i-tunnel"/></svg></div><h4>The VPN is a private tunnel</h4><p>A locked, underground passage between two offices, dug beneath the public road everyone else uses.</p><div class="mreal" style="--nc:var(--cat-security);">= Site-to-Site IPSEC</div></div>
+    </div>
+  </section>
+
+  <!-- 3. TECH CARDS -->
+  <section class="xsection">
+    <div class="xhead">
+      <div class="xeyebrow">The pieces</div>
+      <h2>Every technology, and why it's there</h2>
+      <p>Not just what each thing is — what breaks without it.</p>
+    </div>
+    <div class="grid grid-3">
+      <div class="tech-card"><div class="tech-card-top"><div class="tech-card-icon" style="--nc:var(--cat-network); --nc-soft:var(--cat-network-soft);"><svg class="icon"><use href="#i-router"/></svg></div><div><span class="tech-cat-tag" style="--nc:var(--cat-network);">Networking</span><h4>Internet Gateway</h4></div></div>
+        <div class="tech-row"><span class="tk">Purpose</span><span class="tv">The VPC's only door to the public internet.</span></div>
+        <div class="tech-row"><span class="tk">Why</span><span class="tv">Replaces a physical ISP router — free, managed, always on.</span></div>
+        <div class="tech-row"><span class="tk">Solves</span><span class="tv">Without it, nothing inside the VPC can reach the internet at all.</span></div>
+        <div class="tech-row"><span class="tk">Fits in</span><span class="tv"><a href="#phase1">Phase 1 — Architecture</a></span></div></div>
+
+      <div class="tech-card"><div class="tech-card-top"><div class="tech-card-icon" style="--nc:var(--cat-security); --nc-soft:var(--cat-security-soft);"><svg class="icon"><use href="#i-shield"/></svg></div><div><span class="tech-cat-tag" style="--nc:var(--cat-security);">Security</span><h4>Palo Alto VM-Series</h4></div></div>
+        <div class="tech-row"><span class="tk">Purpose</span><span class="tv">Inspects and filters every packet crossing between zones.</span></div>
+        <div class="tech-row"><span class="tk">Why</span><span class="tv">Industry-standard NGFW — the same product used in real enterprises.</span></div>
+        <div class="tech-row"><span class="tk">Solves</span><span class="tv">Without it, the internet would connect directly to internal systems.</span></div>
+        <div class="tech-row"><span class="tk">Fits in</span><span class="tv"><a href="#phase3">Phase 3–4 — Firewall</a></span></div></div>
+
+      <div class="tech-card"><div class="tech-card-top"><div class="tech-card-icon" style="--nc:var(--cat-network); --nc-soft:var(--cat-network-soft);"><svg class="icon"><use href="#i-fence"/></svg></div><div><span class="tech-cat-tag" style="--nc:var(--cat-network);">Networking</span><h4>Amazon VPC</h4></div></div>
+        <div class="tech-row"><span class="tk">Purpose</span><span class="tv">An isolated, private network inside AWS, entirely yours.</span></div>
+        <div class="tech-row"><span class="tk">Why</span><span class="tv">The foundation everything else gets built inside of.</span></div>
+        <div class="tech-row"><span class="tk">Solves</span><span class="tv">Without it, resources share AWS's flat default network — no segmentation.</span></div>
+        <div class="tech-row"><span class="tk">Fits in</span><span class="tv"><a href="#phase1">Phase 1 — Architecture</a></span></div></div>
+
+      <div class="tech-card"><div class="tech-card-top"><div class="tech-card-icon" style="--nc:var(--cat-network); --nc-soft:var(--cat-network-soft);"><svg class="icon"><use href="#i-grid"/></svg></div><div><span class="tech-cat-tag" style="--nc:var(--cat-network);">Networking</span><h4>Subnets</h4></div></div>
+        <div class="tech-row"><span class="tk">Purpose</span><span class="tv">Split the VPC into smaller, purpose-built rooms.</span></div>
+        <div class="tech-row"><span class="tk">Why</span><span class="tv">Lets you decide exactly what's internet-facing and what isn't.</span></div>
+        <div class="tech-row"><span class="tk">Solves</span><span class="tv">Without them, every resource shares the same exposure.</span></div>
+        <div class="tech-row"><span class="tk">Fits in</span><span class="tv"><a href="#phase2">Phase 2 &amp; 7 — IP &amp; VLANs</a></span></div></div>
+
+      <div class="tech-card"><div class="tech-card-top"><div class="tech-card-icon" style="--nc:var(--cat-cloud); --nc-soft:var(--cat-cloud-soft);"><svg class="icon"><use href="#i-monitor"/></svg></div><div><span class="tech-cat-tag" style="--nc:var(--cat-cloud);">Cloud</span><h4>Amazon EC2</h4></div></div>
+        <div class="tech-row"><span class="tk">Purpose</span><span class="tv">The actual virtual servers — the firewall, and PC-1.</span></div>
+        <div class="tech-row"><span class="tk">Why</span><span class="tv">Pay-as-you-go compute, no physical hardware needed.</span></div>
+        <div class="tech-row"><span class="tk">Solves</span><span class="tv">Without it, there'd be nothing running to test with.</span></div>
+        <div class="tech-row"><span class="tk">Fits in</span><span class="tv"><a href="#phase1">Phase 1 — AWS Build</a></span></div></div>
+
+      <div class="tech-card"><div class="tech-card-top"><div class="tech-card-icon" style="--nc:var(--cat-security); --nc-soft:var(--cat-security-soft);"><svg class="icon"><use href="#i-tunnel"/></svg></div><div><span class="tech-cat-tag" style="--nc:var(--cat-security);">Security</span><h4>IPSEC VPN</h4></div></div>
+        <div class="tech-row"><span class="tk">Purpose</span><span class="tv">Encrypts all traffic between HQ and the branch office.</span></div>
+        <div class="tech-row"><span class="tk">Why</span><span class="tv">IKEv2 + AES-256 — current, non-deprecated standards.</span></div>
+        <div class="tech-row"><span class="tk">Solves</span><span class="tv">Without it, HQ-to-branch traffic crosses the internet in the clear.</span></div>
+        <div class="tech-row"><span class="tk">Fits in</span><span class="tv"><a href="#phase5">Phase 5–6 — Branch &amp; VPN</a></span></div></div>
+
+      <div class="tech-card"><div class="tech-card-top"><div class="tech-card-icon" style="--nc:var(--cat-database); --nc-soft:var(--cat-database-soft);"><svg class="icon"><use href="#i-database"/></svg></div><div><span class="tech-cat-tag" style="--nc:var(--cat-database);">Database</span><h4>AWS Cloud Migration</h4></div></div>
+        <div class="tech-row"><span class="tk">Purpose</span><span class="tv">Extends the same trust boundary into a slice of AWS.</span></div>
+        <div class="tech-row"><span class="tk">Why</span><span class="tv">Proves the design scales past a single office.</span></div>
+        <div class="tech-row"><span class="tk">Solves</span><span class="tv">Without it, growth means re-architecting from scratch.</span></div>
+        <div class="tech-row"><span class="tk">Fits in</span><span class="tv"><a href="#phase8">Phase 8 — Cloud Migration</a></span></div></div>
+
+      <div class="tech-card"><div class="tech-card-top"><div class="tech-card-icon" style="--nc:var(--cat-devops); --nc-soft:var(--cat-devops-soft);"><svg class="icon"><use href="#i-code"/></svg></div><div><span class="tech-cat-tag" style="--nc:var(--cat-devops);">DevOps</span><h4>Terraform</h4></div></div>
+        <div class="tech-row"><span class="tk">Purpose</span><span class="tv">Describes the AWS environment as code instead of clicks.</span></div>
+        <div class="tech-row"><span class="tk">Why</span><span class="tv">Repeatable, reviewable, rebuildable on demand.</span></div>
+        <div class="tech-row"><span class="tk">Solves</span><span class="tv">Without it, every reset means redoing every click by hand.</span></div>
+        <div class="tech-row"><span class="tk">Fits in</span><span class="tv"><a href="#phase9">Phase 9 — IaC</a></span></div></div>
+
+      <div class="tech-card"><div class="tech-card-top"><div class="tech-card-icon" style="--nc:var(--cat-monitoring); --nc-soft:var(--cat-monitoring-soft);"><svg class="icon"><use href="#i-pulse"/></svg></div><div><span class="tech-cat-tag" style="--nc:var(--cat-monitoring);">Monitoring</span><h4>Logging &amp; Monitoring</h4></div></div>
+        <div class="tech-row"><span class="tk">Purpose</span><span class="tv">Centralizes traffic, threat, and session logs.</span></div>
+        <div class="tech-row"><span class="tk">Why</span><span class="tv">You can't secure what you can't see.</span></div>
+        <div class="tech-row"><span class="tk">Solves</span><span class="tv">Without it, a breach could go unnoticed indefinitely.</span></div>
+        <div class="tech-row"><span class="tk">Fits in</span><span class="tv"><a href="#phase8">Phase 8 — CloudWatch</a></span></div></div>
+    </div>
+  </section>
+
+  <!-- 4. BEFORE / AFTER -->
+  <section class="xsection">
+    <div class="xhead">
+      <div class="xeyebrow">Why bother</div>
+      <h2>What each piece actually changes</h2>
+      <p>Not abstract benefits — concrete before-and-after.</p>
+    </div>
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="compare-block"><div class="compare-title">VPC Segmentation</div><div class="compare">
+        <div class="compare-col without"><div class="clabel">Without it</div><ul><li>· Every resource shares one flat network</li><li>· A compromised laptop can reach the database directly</li><li>· No way to tell traffic apart by purpose</li></ul></div>
+        <div class="compare-col with"><div class="clabel">With it</div><ul><li>· Users, servers, guests each get their own room</li><li>· A compromised device is contained to its own room</li><li>· Traffic is provably separated by function</li></ul></div>
+      </div></div>
+      <div class="compare-block"><div class="compare-title">The Firewall</div><div class="compare">
+        <div class="compare-col without"><div class="clabel">Without it</div><ul><li>· Internet traffic reaches internal servers directly</li><li>· No inspection, no logging, no policy</li><li>· One open port is one open door</li></ul></div>
+        <div class="compare-col with"><div class="clabel">With it</div><ul><li>· Every packet is inspected before it's let through</li><li>· Full traffic and threat logs</li><li>· Explicit allow-list, deny by default</li></ul></div>
+      </div></div>
+      <div class="compare-block"><div class="compare-title">The VPN</div><div class="compare">
+        <div class="compare-col without"><div class="clabel">Without it</div><ul><li>· Branch traffic crosses the internet in the clear</li><li>· Anyone on the path could read it</li><li>· No way to prove it wasn't tampered with</li></ul></div>
+        <div class="compare-col with"><div class="clabel">With it</div><ul><li>· AES-256 encrypted tunnel, HQ to branch</li><li>· Re-keyed automatically every hour</li><li>· Behaves like one private network</li></ul></div>
+      </div></div>
+      <div class="compare-block"><div class="compare-title">Terraform (IaC)</div><div class="compare">
+        <div class="compare-col without"><div class="clabel">Without it</div><ul><li>· Every environment rebuilt by hand, click by click</li><li>· No record of what was actually configured</li><li>· Drift between environments is invisible</li></ul></div>
+        <div class="compare-col with"><div class="clabel">With it</div><ul><li>· The whole environment is version-controlled code</li><li>· <code>terraform plan</code> shows changes before they happen</li><li>· Identical environments, every time</li></ul></div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- 5. TIMELINE -->
+  <section class="xsection" style="border-bottom:none;">
+    <div class="xhead">
+      <div class="xeyebrow">The journey</div>
+      <h2>Same project, in the order it was actually built</h2>
+      <p>Click any stop to jump straight to that phase in the full technical build below.</p>
+    </div>
+    <div class="xtimeline">
+      <a href="#kickoff" class="xt-stop"><div class="xt-dot" style="--nc:var(--cat-network); --nc-soft:var(--cat-network-soft);"><svg class="icon"><use href="#i-bulb"/></svg></div><div class="xt-label">Idea</div></a>
+      <span class="xt-wire"></span>
+      <a href="#phase0" class="xt-stop"><div class="xt-dot" style="--nc:var(--cat-network); --nc-soft:var(--cat-network-soft);"><svg class="icon"><use href="#i-folder"/></svg></div><div class="xt-label">Design Docs</div></a>
+      <span class="xt-wire"></span>
+      <a href="#phase1" class="xt-stop"><div class="xt-dot" style="--nc:var(--cat-network); --nc-soft:var(--cat-network-soft);"><svg class="icon"><use href="#i-router"/></svg></div><div class="xt-label">Architecture</div></a>
+      <span class="xt-wire"></span>
+      <a href="#phase2" class="xt-stop"><div class="xt-dot" style="--nc:var(--cat-network); --nc-soft:var(--cat-network-soft);"><svg class="icon"><use href="#i-grid"/></svg></div><div class="xt-label">IP Plan</div></a>
+      <span class="xt-wire"></span>
+      <a href="#phase3" class="xt-stop"><div class="xt-dot" style="--nc:var(--cat-security); --nc-soft:var(--cat-security-soft);"><svg class="icon"><use href="#i-shield"/></svg></div><div class="xt-label">Firewall</div></a>
+      <span class="xt-wire"></span>
+      <a href="#phase4" class="xt-stop"><div class="xt-dot" style="--nc:var(--cat-security); --nc-soft:var(--cat-security-soft);"><svg class="icon"><use href="#i-wrench"/></svg></div><div class="xt-label">Build &amp; Test</div></a>
+      <span class="xt-wire"></span>
+      <a href="#phase5" class="xt-stop"><div class="xt-dot" style="--nc:var(--cat-security); --nc-soft:var(--cat-security-soft);"><svg class="icon"><use href="#i-tunnel"/></svg></div><div class="xt-label">Branch &amp; VPN</div></a>
+      <span class="xt-wire"></span>
+      <a href="#phase7" class="xt-stop"><div class="xt-dot" style="--nc:var(--cat-network); --nc-soft:var(--cat-network-soft);"><svg class="icon"><use href="#i-switch"/></svg></div><div class="xt-label">VLANs</div></a>
+      <span class="xt-wire"></span>
+      <a href="#phase8" class="xt-stop"><div class="xt-dot" style="--nc:var(--cat-cloud); --nc-soft:var(--cat-cloud-soft);"><svg class="icon"><use href="#i-cloud"/></svg></div><div class="xt-label">Cloud</div></a>
+      <span class="xt-wire"></span>
+      <a href="#phase9" class="xt-stop"><div class="xt-dot" style="--nc:var(--cat-devops); --nc-soft:var(--cat-devops-soft);"><svg class="icon"><use href="#i-code"/></svg></div><div class="xt-label">IaC &amp; Docs</div></a>
+    </div>
+
+    <div class="x-cta">
+      <a href="#tabbar" class="x-cta-btn">See exactly how it's built <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12l7 7 7-7"/></svg></a>
+      <div class="x-cta-sub">Full click-by-click console, live progress tracking, real build notes — below.</div>
+    </div>
+  </section>
+
 </div>
 
 <div class="tabbar" id="tabbar">
@@ -1253,6 +1559,26 @@
   }
   allBoxes.forEach(function(b){ b.addEventListener('change', updateKPIs); });
   updateKPIs();
+
+  var archNodes = Array.prototype.slice.call(document.querySelectorAll('.arch-node'));
+  var archPanel = document.getElementById('archPanel');
+  var archCat = document.getElementById('archCat');
+  var archTitle = document.getElementById('archTitle');
+  var archDesc = document.getElementById('archDesc');
+  archNodes.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      archNodes.forEach(function(b){ b.classList.remove('active'); b.setAttribute('aria-pressed','false'); });
+      btn.classList.add('active'); btn.setAttribute('aria-pressed','true');
+      var nc = btn.style.getPropertyValue('--nc');
+      var ncSoft = btn.style.getPropertyValue('--nc-soft');
+      archPanel.style.setProperty('--nc', nc);
+      archPanel.style.setProperty('--nc-soft', ncSoft);
+      archPanel.style.background = 'var(--nc-soft)';
+      archCat.textContent = btn.dataset.cat || '';
+      archTitle.textContent = btn.dataset.title || '';
+      archDesc.textContent = btn.dataset.desc || '';
+    });
+  });
 
   var revealTargets = Array.prototype.slice.call(document.querySelectorAll('.phase-card, .kpi, .group-heading'));
   revealTargets.forEach(function(el){ el.classList.add('reveal'); });
