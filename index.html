@@ -407,7 +407,7 @@
       <div class="subhead">How to build this — AWS lab</div>
       <p class="lead">You don't have physical hardware, so this v1 topology gets built with EC2 instances inside a VPC instead. Every box in the diagram above maps to a real AWS resource.</p>
 
-      <div class="why-box"><strong>Where did the ISP router go?</strong>In AWS you don't deploy an "ISP router" yourself — an Internet Gateway (IGW) attached to your VPC plays that role. AWS manages that hop for you; you just need a route pointing at it.</div>
+      <div class="why-box"><strong>Where did the ISP router go?</strong>In AWS you don't deploy an "ISP router" yourself — an Internet Gateway (IGW) attached to your VPC plays that role. It isn't your home/office internet router either; that's outside this topology entirely, it's just how your laptop reaches the AWS Console. The IGW is virtual, free, and needed from the very start of Phase 1 — without it the VPC has no path to the internet at all, so nothing else in this phase can be tested.</div>
 
       <div class="table-wrap" style="margin:14px 0 18px;">
         <table><thead><tr><th>Diagram box</th><th>AWS resource</th></tr></thead>
