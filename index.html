@@ -430,11 +430,14 @@
         <li><input type="checkbox" id="p1-8"><label for="p1-8">Disable "source/destination check" on the trust interface<span class="task-note">required so the firewall can forward traffic that isn't addressed to itself — AWS blocks this by default</span></label></li>
         <li><input type="checkbox" id="p1-9"><label for="p1-9">Open security groups<span class="task-note">management SG: your IP → HTTPS/SSH only. data-plane SGs: allow all — PAN-OS does the actual filtering, not the AWS SG</span></label></li>
         <li><input type="checkbox" id="p1-10"><label for="p1-10">Log into PAN-OS at https://&lt;management EIP&gt; and configure interfaces, zones, virtual router, default route, and NAT<span class="task-note">this is the Phase 4 checklist, pointed at your AWS addresses instead of the on-prem plan</span></label></li>
-        <li><input type="checkbox" id="p1-11"><label for="p1-11">Launch PC-1<span class="task-note">EC2 instance in the private/LAN subnet, no public IP — its only way out is through the firewall</span></label></li>
+        <li><input type="checkbox" id="p1-11"><label for="p1-11">Create an IAM role for PC-1: <code>AmazonSSMManagedInstanceCore</code><span class="task-note">without this attached, Session Manager can't reach PC-1 at all — create it before the next step, not after</span></label></li>
+        <li><input type="checkbox" id="p1-12"><label for="p1-12">Launch PC-1 with that IAM role attached<span class="task-note">EC2 instance in the private/LAN subnet, no public IP — its only way out is through the firewall, its only way in is via Session Manager</span></label></li>
       </ul>
 
+      <div class="why-box"><strong>Your laptop vs. PC-1</strong>"PC-1" in the diagram is not your real computer — it's a small EC2 instance standing in for an office desktop. Your real laptop only ever talks to the <em>AWS Console/CLI</em> using your own AWS login; it never gets an IP inside this VPC.</div>
+
       <div class="subhead" style="margin-top:26px;">Validation tests</div>
-      <div class="term"><span class="c2">$</span> aws ssm start-session --target &lt;PC-1 instance-id&gt; <span class="c1">\\ PC-1 has no public IP, connect via Session Manager</span><br><span class="c2">$</span> ping 8.8.8.8<br><span class="c3">#</span> confirm the request shows up in PAN-OS Traffic Monitor as <span class="c1">allow</span></div>
+      <div class="term"><span class="c2">$</span> aws ssm start-session --target &lt;PC-1 instance-id&gt; <span class="c1">\\ from your laptop, via your own AWS login</span><br><span class="c2">$</span> ping 8.8.8.8 <span class="c1">\\ run from inside that session, on PC-1</span><br><span class="c3">#</span> confirm the request shows up in PAN-OS Traffic Monitor as <span class="c1">allow</span></div>
     </div>
   </details>
 
