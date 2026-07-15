@@ -173,7 +173,7 @@
   .glossary-grid dd{ margin:2px 0 0; color:var(--ink-soft); font-size:13.2px; }
 
   /* Folder tree */
-  .tree{ font-family:var(--font-mono); font-size:12.8px; line-height:1.9; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:16px 20px; box-shadow:var(--shadow); overflow-x:auto; color:var(--ink-soft); }
+  .tree{ font-family:var(--font-mono); font-size:12.8px; line-height:1.9; white-space:pre; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:16px 20px; box-shadow:var(--shadow); overflow-x:auto; color:var(--ink-soft); }
   .tree .root{ color:var(--ink); font-weight:700; }
   .tree .comment{ color:var(--ink-faint); }
 
@@ -354,8 +354,7 @@
       <p style="color:var(--ink-soft); max-width:68ch;">Establish a documentation structure that every later phase writes into, so the finished project is a portfolio artifact, not just a working lab.</p>
 
       <div class="subhead">Design — Working Folder Structure</div>
-      <div class="tree">
-<span class="root">Enterprise-Infrastructure-Lab/</span>
+      <div class="tree"><span class="root">Enterprise-Infrastructure-Lab/</span>
 ├── 01-Requirements           <span class="comment">// business case, scope</span>
 ├── 02-Network-Diagrams       <span class="comment">// topology per phase</span>
 ├── 03-IP-Addressing          <span class="comment">// subnet plans, allocation tables</span>
@@ -364,8 +363,7 @@
 ├── 06-VPN                    <span class="comment">// IKE / IPSEC parameters</span>
 ├── 07-AWS-Migration          <span class="comment">// VPC design, Terraform</span>
 ├── 08-Troubleshooting        <span class="comment">// test logs, known issues</span>
-└── 09-Lessons-Learned        <span class="comment">// retros per phase</span>
-      </div>
+└── 09-Lessons-Learned        <span class="comment">// retros per phase</span></div>
 
       <div class="subhead">Documentation Output</div>
       <p style="color:var(--ink-soft); max-width:68ch; margin:0;">This working structure, committed to version control alongside every diagram and config export produced in Phases 1–10.</p>
