@@ -1,4 +1,4 @@
-<title>Enterprise Network &amp; Hybrid Cloud Infrastructure Lab</title>
+<title>Enterprise Network &amp; Hybrid Cloud Infrastructure — Engineering Design Doc</title>
 <style>
   :root{
     --bg:#f5f6f8;
@@ -20,6 +20,8 @@
     --zone-server-soft:rgba(32,94,166,0.10);
     --zone-dmz:#b8860b;
     --zone-dmz-soft:rgba(184,134,11,0.10);
+    --why:#8a5cb0;
+    --why-soft:rgba(138,92,176,0.09);
     --ok:#1c8a54;
     --warn:#b8860b;
     --danger:#c0392b;
@@ -28,33 +30,20 @@
     --font-body:-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
     --font-mono:ui-monospace,"Cascadia Code","SF Mono",Consolas,"Liberation Mono",monospace;
     --radius:8px;
-    --sidebar-w:272px;
+    --sidebar-w:280px;
     --header-h:60px;
   }
   @media (prefers-color-scheme: dark){
     :root{
-      --bg:#0b0f14;
-      --surface:#121821;
-      --surface-2:#19212c;
-      --ink:#e7eaef;
-      --ink-soft:#a3adba;
-      --ink-faint:#6b7684;
-      --line:rgba(231,234,239,0.12);
-      --line-strong:rgba(231,234,239,0.22);
-      --accent:#5aa3ea;
-      --accent-ink:#bcdcff;
-      --accent-soft:rgba(90,163,234,0.14);
-      --zone-untrust:#e2685c;
-      --zone-untrust-soft:rgba(226,104,92,0.14);
-      --zone-trust:#4ecb8c;
-      --zone-trust-soft:rgba(78,203,140,0.14);
-      --zone-server:#6fabee;
-      --zone-server-soft:rgba(111,171,238,0.14);
-      --zone-dmz:#dba83f;
-      --zone-dmz-soft:rgba(219,168,63,0.14);
-      --ok:#4ecb8c;
-      --warn:#dba83f;
-      --danger:#e2685c;
+      --bg:#0b0f14; --surface:#121821; --surface-2:#19212c; --ink:#e7eaef; --ink-soft:#a3adba; --ink-faint:#6b7684;
+      --line:rgba(231,234,239,0.12); --line-strong:rgba(231,234,239,0.22);
+      --accent:#5aa3ea; --accent-ink:#bcdcff; --accent-soft:rgba(90,163,234,0.14);
+      --zone-untrust:#e2685c; --zone-untrust-soft:rgba(226,104,92,0.14);
+      --zone-trust:#4ecb8c; --zone-trust-soft:rgba(78,203,140,0.14);
+      --zone-server:#6fabee; --zone-server-soft:rgba(111,171,238,0.14);
+      --zone-dmz:#dba83f; --zone-dmz-soft:rgba(219,168,63,0.14);
+      --why:#c39bde; --why-soft:rgba(195,155,222,0.12);
+      --ok:#4ecb8c; --warn:#dba83f; --danger:#e2685c;
       --shadow:0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
     }
   }
@@ -66,6 +55,7 @@
     --zone-trust:#4ecb8c; --zone-trust-soft:rgba(78,203,140,0.14);
     --zone-server:#6fabee; --zone-server-soft:rgba(111,171,238,0.14);
     --zone-dmz:#dba83f; --zone-dmz-soft:rgba(219,168,63,0.14);
+    --why:#c39bde; --why-soft:rgba(195,155,222,0.12);
     --ok:#4ecb8c; --warn:#dba83f; --danger:#e2685c;
     --shadow:0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
   }
@@ -77,6 +67,7 @@
     --zone-trust:#1c8a54; --zone-trust-soft:rgba(28,138,84,0.10);
     --zone-server:#205ea6; --zone-server-soft:rgba(32,94,166,0.10);
     --zone-dmz:#b8860b; --zone-dmz-soft:rgba(184,134,11,0.10);
+    --why:#8a5cb0; --why-soft:rgba(138,92,176,0.09);
     --ok:#1c8a54; --warn:#b8860b; --danger:#c0392b;
     --shadow:0 1px 2px rgba(19,26,36,0.06), 0 8px 24px -12px rgba(19,26,36,0.18);
   }
@@ -85,115 +76,73 @@
   html{scroll-behavior:smooth;}
   @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;} }
 
-  body{
-    margin:0;
-    background:var(--bg);
-    color:var(--ink);
-    font-family:var(--font-body);
-    font-size:15.5px;
-    line-height:1.6;
-    -webkit-font-smoothing:antialiased;
-  }
-
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:15.5px; line-height:1.65; -webkit-font-smoothing:antialiased; }
   ::selection{ background:var(--accent-soft); color:var(--ink); }
-
   a{ color:var(--accent); }
-
-  h1,h2,h3,h4{
-    font-family:var(--font-display);
-    font-weight:700;
-    letter-spacing:-0.01em;
-    text-wrap:balance;
-    color:var(--ink);
-    margin:0 0 0.5em;
-  }
-
-  code, .mono, .ip, td.mono, .badge, .kbd{
-    font-family:var(--font-mono);
-    font-variant-numeric:tabular-nums;
-  }
+  h1,h2,h3,h4{ font-family:var(--font-display); font-weight:700; letter-spacing:-0.01em; text-wrap:balance; color:var(--ink); margin:0 0 0.5em; }
+  code,.mono,.ip,td.mono,.badge{ font-family:var(--font-mono); font-variant-numeric:tabular-nums; }
+  abbr[title]{ text-decoration:none; border-bottom:1px dotted var(--ink-faint); cursor:help; }
+  p{ margin:0 0 1em; }
 
   /* ===== Header ===== */
-  .topbar{
-    position:fixed; top:0; left:0; right:0; height:var(--header-h);
-    display:flex; align-items:center; gap:14px;
-    padding:0 18px;
-    background:color-mix(in srgb, var(--surface) 92%, transparent);
-    backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--line);
-    z-index:100;
-  }
-  .topbar .brand{
-    display:flex; align-items:center; gap:10px;
-    font-family:var(--font-display); font-weight:700; font-size:14.5px;
-    color:var(--ink); white-space:nowrap;
-  }
-  .brand-mark{
-    width:26px; height:26px; border-radius:6px;
-    background:linear-gradient(135deg, var(--accent), var(--zone-trust));
-    display:flex; align-items:center; justify-content:center;
-    color:#fff; font-size:11px; font-weight:800; font-family:var(--font-mono);
-    flex:none;
-  }
-  .brand small{ display:block; font-weight:500; color:var(--ink-faint); font-size:11px; letter-spacing:0.02em; }
+  .topbar{ position:fixed; top:0; left:0; right:0; height:var(--header-h); display:flex; align-items:center; gap:14px; padding:0 18px;
+    background:color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); z-index:100; }
+  .topbar .brand{ display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:700; font-size:14px; color:var(--ink); white-space:nowrap; }
+  .brand-mark{ width:26px; height:26px; border-radius:6px; background:linear-gradient(135deg, var(--accent), var(--zone-trust)); display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:800; font-family:var(--font-mono); flex:none; }
+  .brand small{ display:block; font-weight:500; color:var(--ink-faint); font-size:10.5px; letter-spacing:0.02em; }
   .topbar-spacer{ flex:1; }
-  .progress-pill{
-    display:flex; align-items:center; gap:8px;
-    font-family:var(--font-mono); font-size:11.5px; color:var(--ink-soft);
-    border:1px solid var(--line); border-radius:999px; padding:5px 12px 5px 6px;
-    background:var(--surface-2);
-  }
+  .progress-pill{ display:flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:11.5px; color:var(--ink-soft);
+    border:1px solid var(--line); border-radius:999px; padding:5px 12px 5px 6px; background:var(--surface-2); }
   .progress-pill .bar{ width:80px; height:5px; border-radius:999px; background:var(--line); overflow:hidden; }
   .progress-pill .bar > span{ display:block; height:100%; background:var(--ok); width:0%; transition:width .4s ease; }
-  .nav-toggle{
-    display:none; border:1px solid var(--line); background:var(--surface-2); color:var(--ink);
-    border-radius:6px; width:34px; height:34px; align-items:center; justify-content:center; cursor:pointer;
-  }
+  .nav-toggle{ display:none; border:1px solid var(--line); background:var(--surface-2); color:var(--ink); border-radius:6px; width:34px; height:34px; align-items:center; justify-content:center; cursor:pointer; }
 
   /* ===== Layout ===== */
   .shell{ display:flex; padding-top:var(--header-h); min-height:100vh; }
-
-  .sidebar{
-    position:fixed; top:var(--header-h); left:0; bottom:0; width:var(--sidebar-w);
-    border-right:1px solid var(--line); background:var(--surface);
-    overflow-y:auto; padding:20px 12px 40px;
-  }
-  .sidebar-section-label{
-    font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase;
-    color:var(--ink-faint); padding:14px 10px 6px;
-  }
-  .sidebar nav a{
-    display:flex; align-items:baseline; gap:9px;
-    padding:7px 10px; border-radius:6px; text-decoration:none;
-    color:var(--ink-soft); font-size:13.5px; font-weight:500;
-  }
-  .sidebar nav a .n{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); flex:none; width:16px; }
+  .sidebar{ position:fixed; top:var(--header-h); left:0; bottom:0; width:var(--sidebar-w); border-right:1px solid var(--line); background:var(--surface); overflow-y:auto; padding:18px 12px 40px; }
+  .sidebar-section-label{ font-family:var(--font-mono); font-size:10.2px; letter-spacing:0.09em; text-transform:uppercase; color:var(--ink-faint); padding:16px 10px 6px; }
+  .sidebar-section-label:first-child{ padding-top:4px; }
+  .sidebar nav a{ display:flex; align-items:baseline; gap:9px; padding:7px 10px; border-radius:6px; text-decoration:none; color:var(--ink-soft); font-size:13.2px; font-weight:500; }
+  .sidebar nav a .n{ font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint); flex:none; width:30px; }
   .sidebar nav a:hover{ background:var(--surface-2); color:var(--ink); }
   .sidebar nav a.active{ background:var(--accent-soft); color:var(--accent-ink); }
   .sidebar nav a.active .n{ color:var(--accent); }
 
-  main{ flex:1; margin-left:var(--sidebar-w); max-width:1000px; padding:0 40px 80px; }
+  main{ flex:1; margin-left:var(--sidebar-w); max-width:980px; padding:0 40px 80px; }
 
-  .hero{ padding:44px 0 30px; border-bottom:1px solid var(--line); margin-bottom:8px; }
-  .eyebrow{
-    font-family:var(--font-mono); font-size:11px; letter-spacing:0.10em; text-transform:uppercase;
-    color:var(--accent); margin-bottom:12px; display:flex; align-items:center; gap:8px;
-  }
+  .hero{ padding:44px 0 26px; border-bottom:1px solid var(--line); margin-bottom:8px; }
+  .eyebrow{ font-family:var(--font-mono); font-size:11px; letter-spacing:0.10em; text-transform:uppercase; color:var(--accent); margin-bottom:12px; display:flex; align-items:center; gap:8px; }
   .eyebrow::before{ content:""; width:16px; height:1px; background:var(--accent); display:inline-block; }
-  .hero h1{ font-size:32px; max-width:16ch; }
-  .hero .sub{ color:var(--ink-soft); max-width:62ch; font-size:16px; margin-top:10px; }
-  .hero-meta{ display:flex; flex-wrap:wrap; gap:10px; margin-top:20px; }
-  .meta-chip{
-    font-family:var(--font-mono); font-size:11.5px; color:var(--ink-soft);
-    border:1px solid var(--line); border-radius:6px; padding:5px 10px; background:var(--surface-2);
-  }
+  .hero h1{ font-size:30px; max-width:20ch; }
+  .hero .sub{ color:var(--ink-soft); max-width:64ch; font-size:16px; margin-top:10px; }
+  .hero-meta{ display:flex; flex-wrap:wrap; gap:10px; margin:18px 0 22px; }
+  .meta-chip{ font-family:var(--font-mono); font-size:11.5px; color:var(--ink-soft); border:1px solid var(--line); border-radius:6px; padding:5px 10px; background:var(--surface-2); }
 
-  section.doc-section{ padding:52px 0; border-bottom:1px solid var(--line); scroll-margin-top:calc(var(--header-h) + 12px); }
+  .quote-card{ display:grid; grid-template-columns:1fr 1fr; gap:0; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); margin-bottom:6px; }
+  @media (max-width:700px){ .quote-card{ grid-template-columns:1fr; } }
+  .quote-card > div{ padding:18px 20px; }
+  .quote-card .qlabel{ font-family:var(--font-mono); font-size:10.2px; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:8px; }
+  .quote-card .beginner{ background:var(--surface-2); }
+  .quote-card .beginner .qlabel{ color:var(--ink-faint); }
+  .quote-card .beginner q{ color:var(--ink-soft); }
+  .quote-card .engineer{ background:var(--accent-soft); }
+  .quote-card .engineer .qlabel{ color:var(--accent-ink); }
+  .quote-card q{ font-size:14.5px; line-height:1.55; font-style:normal; quotes:none; display:block; }
+
+  /* ===== Section scaffolding ===== */
+  section.doc-section{ padding:50px 0; border-bottom:1px solid var(--line); scroll-margin-top:calc(var(--header-h) + 12px); }
   section.doc-section:last-of-type{ border-bottom:none; }
-  .section-head{ display:flex; align-items:baseline; gap:12px; margin-bottom:22px; }
-  .section-num{ font-family:var(--font-mono); font-size:13px; color:var(--accent); font-weight:700; }
-  .section-head h2{ font-size:23px; }
-  .section-intro{ color:var(--ink-soft); max-width:70ch; margin-bottom:26px; }
+  .section-head{ margin-bottom:8px; }
+  .section-eyebrow{ font-family:var(--font-mono); font-size:10.8px; letter-spacing:0.08em; text-transform:uppercase; color:var(--accent); margin-bottom:6px; }
+  .section-head h2{ font-size:22px; }
+  .section-intro{ color:var(--ink-soft); max-width:70ch; margin:10px 0 28px; font-size:15px; }
+
+  .subhead{ display:flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin:30px 0 12px; }
+  .subhead:first-of-type{ margin-top:0; }
+  .subhead::before{ content:""; width:7px; height:7px; border-radius:2px; background:var(--accent); flex:none; }
+
+  .why-box{ border-left:3px solid var(--why); background:var(--why-soft); border-radius:0 6px 6px 0; padding:12px 16px; margin:14px 0; font-size:13.6px; color:var(--ink-soft); }
+  .why-box strong{ color:var(--why); font-family:var(--font-mono); font-size:10.8px; letter-spacing:0.06em; text-transform:uppercase; display:block; margin-bottom:4px; }
 
   /* ===== Cards / grid ===== */
   .grid{ display:grid; gap:16px; }
@@ -201,47 +150,46 @@
   .grid-3{ grid-template-columns:repeat(3, 1fr); }
   .grid-4{ grid-template-columns:repeat(4, 1fr); }
   @media (max-width:760px){ .grid-2,.grid-3,.grid-4{ grid-template-columns:1fr; } }
-
-  .card{
-    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
-    padding:18px 20px; box-shadow:var(--shadow);
-  }
+  .card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px; box-shadow:var(--shadow); }
   .card h3{ font-size:15px; margin-bottom:6px; }
+  .card h4{ font-size:13.5px; margin-bottom:4px; }
   .card p{ color:var(--ink-soft); font-size:13.8px; margin:0; }
   .card ul{ margin:8px 0 0; padding-left:18px; color:var(--ink-soft); font-size:13.8px; }
   .card ul li{ margin-bottom:3px; }
 
-  /* Zone cards */
   .zone-card{ border-left:3px solid var(--zc); }
-  .zone-card .zone-tag{
-    display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:11px;
-    letter-spacing:0.06em; padding:3px 8px; border-radius:5px; background:var(--zc-soft); color:var(--zc); font-weight:700; margin-bottom:10px;
-  }
+  .zone-card .zone-tag{ display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; padding:3px 8px; border-radius:5px; background:var(--zc-soft); color:var(--zc); font-weight:700; margin-bottom:10px; }
 
-  /* Roadmap */
-  .roadmap{ display:flex; flex-direction:column; gap:0; border-left:2px solid var(--line); margin-left:8px; }
-  .phase{ position:relative; padding:0 0 28px 26px; }
-  .phase:last-child{ padding-bottom:0; }
-  .phase::before{
-    content:attr(data-n); position:absolute; left:-13px; top:0; width:24px; height:24px; border-radius:50%;
-    background:var(--surface); border:2px solid var(--accent); color:var(--accent);
-    font-family:var(--font-mono); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center;
-  }
-  .phase h4{ font-size:14.5px; margin-bottom:3px; }
-  .phase .phase-tag{ font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint); letter-spacing:0.05em; text-transform:uppercase; }
-  .phase p{ color:var(--ink-soft); font-size:13.6px; margin:4px 0 0; max-width:60ch; }
+  /* Glossary */
+  details.glossary{ border:1px solid var(--line); border-radius:var(--radius); background:var(--surface); box-shadow:var(--shadow); }
+  details.glossary summary{ list-style:none; cursor:pointer; padding:16px 20px; display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:700; font-size:14.5px; }
+  details.glossary summary::-webkit-details-marker{ display:none; }
+  details.glossary summary .chev{ transition:transform .18s ease; color:var(--ink-faint); flex:none; }
+  details.glossary[open] summary .chev{ transform:rotate(90deg); }
+  details.glossary summary .hint{ margin-left:auto; font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); font-weight:500; }
+  .glossary-grid{ padding:4px 20px 20px; border-top:1px solid var(--line); display:grid; grid-template-columns:repeat(2,1fr); gap:12px 24px; margin-top:14px; }
+  @media (max-width:700px){ .glossary-grid{ grid-template-columns:1fr; } }
+  .glossary-grid dt{ font-family:var(--font-mono); font-size:12.5px; font-weight:700; color:var(--ink); }
+  .glossary-grid dd{ margin:2px 0 0; color:var(--ink-soft); font-size:13.2px; }
+
+  /* Folder tree */
+  .tree{ font-family:var(--font-mono); font-size:12.8px; line-height:1.9; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:16px 20px; box-shadow:var(--shadow); overflow-x:auto; color:var(--ink-soft); }
+  .tree .root{ color:var(--ink); font-weight:700; }
+  .tree .comment{ color:var(--ink-faint); }
+
+  /* Step list (procedures) */
+  ol.step-list{ counter-reset:step; list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:0; border-left:2px solid var(--line); margin-left:8px; }
+  ol.step-list li{ counter-increment:step; position:relative; padding:0 0 22px 26px; }
+  ol.step-list li:last-child{ padding-bottom:0; }
+  ol.step-list li::before{ content:counter(step); position:absolute; left:-13px; top:0; width:24px; height:24px; border-radius:50%; background:var(--surface); border:2px solid var(--accent); color:var(--accent); font-family:var(--font-mono); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  ol.step-list h4{ font-size:14px; margin-bottom:2px; }
+  ol.step-list p{ color:var(--ink-soft); font-size:13.4px; margin:2px 0 0; max-width:60ch; }
+  ol.step-list code{ font-size:12.5px; background:var(--surface-2); padding:1px 6px; border-radius:4px; }
 
   /* Diagram panel */
-  .diagram-panel{
-    background:
-      radial-gradient(circle, var(--line) 1px, transparent 1px) 0 0/20px 20px,
-      var(--surface);
-    border:1px solid var(--line); border-radius:var(--radius); padding:28px 12px;
-    overflow-x:auto; box-shadow:var(--shadow);
-  }
+  .diagram-panel{ background:radial-gradient(circle, var(--line) 1px, transparent 1px) 0 0/20px 20px, var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:26px 12px; overflow-x:auto; box-shadow:var(--shadow); }
   .diagram-panel svg{ display:block; margin:0 auto; min-width:520px; }
   .diagram-caption{ text-align:center; font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); margin-top:10px; letter-spacing:0.03em; }
-
   svg text{ font-family:var(--font-body); fill:var(--ink); }
   svg text.mono-label{ font-family:var(--font-mono); }
   svg .box{ fill:var(--surface); stroke:var(--line-strong); stroke-width:1.4; }
@@ -252,59 +200,40 @@
 
   /* ===== Tables ===== */
   .table-wrap{ overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius); background:var(--surface); box-shadow:var(--shadow); }
-  table{ border-collapse:collapse; width:100%; min-width:560px; font-size:13.6px; }
-  thead th{
-    text-align:left; font-family:var(--font-mono); font-size:10.8px; letter-spacing:0.06em; text-transform:uppercase;
-    color:var(--ink-faint); background:var(--surface-2); padding:11px 16px; border-bottom:1px solid var(--line); white-space:nowrap;
-  }
+  table{ border-collapse:collapse; width:100%; min-width:520px; font-size:13.5px; }
+  thead th{ text-align:left; font-family:var(--font-mono); font-size:10.6px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-faint); background:var(--surface-2); padding:11px 16px; border-bottom:1px solid var(--line); white-space:nowrap; }
   tbody td{ padding:11px 16px; border-bottom:1px solid var(--line); color:var(--ink-soft); vertical-align:top; }
   tbody tr:last-child td{ border-bottom:none; }
   tbody tr:hover{ background:var(--surface-2); }
   td.mono, th.mono{ font-family:var(--font-mono); color:var(--ink); }
-  .pill{
-    display:inline-block; font-family:var(--font-mono); font-size:11px; font-weight:700; padding:2px 9px; border-radius:999px;
-  }
+  .pill{ display:inline-block; font-family:var(--font-mono); font-size:11px; font-weight:700; padding:2px 9px; border-radius:999px; }
   .pill-allow{ background:var(--zone-trust-soft); color:var(--ok); }
   .pill-deny{ background:var(--zone-untrust-soft); color:var(--danger); }
-
-  /* ===== VLAN swatches ===== */
   .swatch{ width:10px; height:10px; border-radius:3px; display:inline-block; margin-right:8px; }
 
-  /* ===== Details / collapsible ===== */
-  details.collapse{
-    border:1px solid var(--line); border-radius:var(--radius); background:var(--surface); box-shadow:var(--shadow);
-    margin-bottom:14px; overflow:hidden;
-  }
-  details.collapse + details.collapse{ margin-top:14px; }
-  details.collapse summary{
-    list-style:none; cursor:pointer; padding:16px 20px; display:flex; align-items:center; gap:12px;
-    font-family:var(--font-display); font-weight:700; font-size:14.5px;
-  }
-  details.collapse summary::-webkit-details-marker{ display:none; }
-  details.collapse summary .chev{ transition:transform .18s ease; color:var(--ink-faint); flex:none; }
-  details.collapse[open] summary .chev{ transform:rotate(90deg); }
-  details.collapse summary .phase-progress{
-    margin-left:auto; font-family:var(--font-mono); font-size:11.5px; color:var(--ink-faint); font-weight:500;
-  }
-  details.collapse .collapse-body{ padding:0 20px 20px; border-top:1px solid var(--line); }
-
-  .check-list{ list-style:none; margin:16px 0 0; padding:0; display:flex; flex-direction:column; gap:2px; }
-  .check-list li{ display:flex; align-items:center; gap:10px; padding:8px 4px; border-radius:6px; font-size:14px; }
+  /* Checklist */
+  .check-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:2px; }
+  .check-list li{ display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:6px; font-size:14px; }
   .check-list li:hover{ background:var(--surface-2); }
   .check-list input[type="checkbox"]{ width:16px; height:16px; accent-color:var(--ok); flex:none; }
   .check-list label{ cursor:pointer; }
   .check-list input:checked + label{ color:var(--ink-faint); text-decoration:line-through; }
 
-  /* ===== Code / terminal blocks ===== */
-  .term{
-    background:var(--ink); color:#dfe7ee; border-radius:var(--radius); padding:16px 18px; font-family:var(--font-mono);
-    font-size:12.8px; line-height:1.7; overflow-x:auto; box-shadow:var(--shadow);
-  }
-  :root[data-theme="dark"] .term, @media (prefers-color-scheme: dark){ .term{ background:#05070a; } }
+  /* Terminal / log */
+  .term{ background:var(--ink); color:#dfe7ee; border-radius:var(--radius); padding:16px 18px; font-family:var(--font-mono); font-size:12.8px; line-height:1.75; overflow-x:auto; box-shadow:var(--shadow); }
+  @media (prefers-color-scheme: dark){ .term{ background:#05070a; } }
+  :root[data-theme="dark"] .term{ background:#05070a; }
   .term .c1{ color:#7fd6a3; } .term .c2{ color:#7fb8f0; } .term .c3{ color:#f0c37f; }
   .term-title{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:8px; }
 
-  /* ===== Migration before/after ===== */
+  .log-card{ border:1px solid var(--line); border-radius:var(--radius); background:var(--surface); box-shadow:var(--shadow); padding:14px 18px; font-family:var(--font-mono); font-size:12.8px; }
+  .log-card .row{ display:flex; gap:10px; padding:4px 0; border-bottom:1px dashed var(--line); }
+  .log-card .row:last-child{ border-bottom:none; }
+  .log-card .k{ color:var(--ink-faint); width:110px; flex:none; }
+  .log-card .v{ color:var(--ink); }
+  .log-card .v.allow{ color:var(--ok); font-weight:700; }
+
+  /* Migration before/after */
   .migration{ display:grid; grid-template-columns:1fr auto 1fr; gap:0; align-items:stretch; }
   @media (max-width:760px){ .migration{ grid-template-columns:1fr; } .migration .arrow{ transform:rotate(90deg); margin:6px auto; } }
   .migration .col{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:22px; box-shadow:var(--shadow); }
@@ -318,6 +247,8 @@
   .migration .col.after li{ color:var(--ink); }
   .dot{ width:6px; height:6px; border-radius:50%; background:var(--ink-faint); flex:none; }
   .migration .col.after .dot{ background:var(--accent); }
+
+  .phase-progress-chip{ font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint); font-weight:500; }
 
   footer{ margin-left:var(--sidebar-w); padding:30px 40px 60px; color:var(--ink-faint); font-size:12.5px; font-family:var(--font-mono); }
 
@@ -337,236 +268,187 @@
   </button>
   <div class="brand">
     <span class="brand-mark">NW</span>
-    <span>Enterprise Network &amp; Hybrid Cloud Lab<br><small>Infrastructure Design Documentation</small></span>
+    <span>Enterprise Network → Hybrid Cloud<br><small>Engineering Design Documentation</small></span>
   </div>
   <div class="topbar-spacer"></div>
   <div class="progress-pill">
-    <span id="progressLabel">0 / 9 tasks</span>
+    <span id="progressLabel">0 / 0 tasks</span>
     <span class="bar"><span id="progressBar"></span></span>
   </div>
 </div>
 
 <div class="shell">
   <aside class="sidebar" id="sidebar">
-    <div class="sidebar-section-label">Documentation</div>
+    <div class="sidebar-section-label">Foundation</div>
     <nav id="sideNav">
-      <a href="#overview"><span class="n">01</span>Project Overview</a>
-      <a href="#architecture"><span class="n">02</span>Network Architecture</a>
-      <a href="#ip-plan"><span class="n">03</span>IP Addressing Plan</a>
-      <a href="#firewall"><span class="n">04</span>Firewall Design</a>
-      <a href="#vpn"><span class="n">05</span>VPN Design</a>
-      <a href="#vlan"><span class="n">06</span>VLAN Design</a>
-      <a href="#cloud"><span class="n">07</span>Cloud Migration</a>
-      <a href="#checklist"><span class="n">08</span>Implementation Checklist</a>
-      <a href="#testing"><span class="n">09</span>Testing &amp; Troubleshooting</a>
-      <a href="#future"><span class="n">10</span>Future Improvements</a>
+      <a href="#kickoff"><span class="n">Start</span>Business Case</a>
+      <a href="#phase0"><span class="n">PH.00</span>Design Documentation</a>
+      <a href="#phase1"><span class="n">PH.01</span>Network Architecture</a>
+      <a href="#phase2"><span class="n">PH.02</span>IP Address Design</a>
+    </nav>
+    <div class="sidebar-section-label">Core Build</div>
+    <nav>
+      <a href="#phase3"><span class="n">PH.03</span>Firewall Design</a>
+      <a href="#phase4"><span class="n">PH.04</span>Implementation &amp; Testing</a>
+    </nav>
+    <div class="sidebar-section-label">Expansion</div>
+    <nav>
+      <a href="#phase5"><span class="n">PH.05</span>Branch Office</a>
+      <a href="#phase6"><span class="n">PH.06</span>IPSEC VPN Design</a>
+      <a href="#phase7"><span class="n">PH.07</span>Switching &amp; VLANs</a>
+    </nav>
+    <div class="sidebar-section-label">Cloud &amp; Ops</div>
+    <nav>
+      <a href="#phase8"><span class="n">PH.08</span>Cloud Migration</a>
+      <a href="#phase9"><span class="n">PH.09</span>Infrastructure as Code</a>
+      <a href="#phase10"><span class="n">PH.10</span>Documentation</a>
     </nav>
   </aside>
 
   <main>
     <div class="hero">
-      <div class="eyebrow">Design Documentation · Rev 1.0 · 2026</div>
-      <h1>Enterprise Network &amp; Hybrid Cloud Infrastructure Lab</h1>
-      <p class="sub">Reference architecture for a secure enterprise network built on a Palo Alto perimeter, switched VLAN segmentation, and site-to-site IPSEC — extended into an AWS hybrid cloud footprint and codified with Terraform.</p>
+      <div class="eyebrow">Design Documentation · Rev 2.0 · 2026</div>
+      <h1>Enterprise Network → Hybrid Cloud Infrastructure</h1>
+      <p class="sub">Built the way a real infrastructure team builds it: requirements first, design on paper before a single interface is touched, then implementation in eleven sequential phases — from a single firewall to a Terraform-managed AWS footprint.</p>
       <div class="hero-meta">
-        <span class="meta-chip">Author: Network/Cloud Engineering</span>
-        <span class="meta-chip">Status: Design &amp; Lab Build</span>
+        <span class="meta-chip">Client: Example Corp</span>
         <span class="meta-chip">Platform: Palo Alto PAN-OS · AWS · Terraform</span>
+        <span class="meta-chip">Format: 11 phases, each with Objective → Design → IP Plan → Config → Validation → Docs</span>
+      </div>
+      <div class="quote-card">
+        <div class="beginner"><div class="qlabel">What a beginner says</div><q>"I configured Palo Alto."</q></div>
+        <div class="engineer"><div class="qlabel">What this project demonstrates</div><q>"I designed and implemented a segmented enterprise network, deployed firewall policy, established IPSEC connectivity, and extended the architecture into AWS."</q></div>
       </div>
     </div>
 
-    <!-- 1. PROJECT OVERVIEW -->
-    <section class="doc-section" id="overview">
-      <div class="section-head"><span class="section-num">01</span><h2>Project Overview</h2></div>
-      <p class="section-intro">A ground-up design and lab build of an enterprise network, progressing from a single-site firewall foundation to a fully segmented, monitored, and hybrid-cloud-connected infrastructure managed as code.</p>
+    <!-- KICKOFF -->
+    <section class="doc-section" id="kickoff">
+      <div class="section-head"><div class="section-eyebrow">Kickoff</div><h2>Business Case &amp; Requirements</h2></div>
+      <p class="section-intro">Every design decision in this document traces back to a stated requirement below — nothing is configured just because it's possible.</p>
 
-      <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="grid grid-2">
         <div class="card">
-          <h3>Business Scenario</h3>
-          <p>A growing company needs a secure, segmented network at its headquarters, a resilient encrypted link to a new branch office, and a path to extend workloads into AWS without re-architecting security policy. The design must support internal user, server, and guest traffic separation, centralized firewall policy enforcement, and auditable logging for compliance.</p>
+          <h3>The Company</h3>
+          <p><strong>Example Corp</strong> — a 50-employee company with one headquarters office, a set of internal servers, and existing internet access. No formal network segmentation or firewall policy exists yet. A branch office is planned, and a future migration to AWS is on the roadmap.</p>
         </div>
         <div class="card">
-          <h3>Objectives</h3>
+          <h3>Requirements</h3>
           <ul>
-            <li>Establish a hardened perimeter with Palo Alto NGFW</li>
-            <li>Segment traffic by function using VLANs and zones</li>
-            <li>Connect HQ and branch over site-to-site IPSEC VPN</li>
-            <li>Enforce least-privilege access with policy matrices</li>
-            <li>Centralize logging and monitoring for visibility</li>
-            <li>Extend the trust model into AWS via hybrid connectivity</li>
-            <li>Codify the environment with Terraform for repeatability</li>
+            <li>Secure, filtered internet access for all staff</li>
+            <li>Network segmentation between departments and functions</li>
+            <li>Stateful firewall protection at the perimeter</li>
+            <li>Encrypted site-to-site connection to a future branch</li>
+            <li>A design that migrates cleanly into a cloud provider</li>
+            <li>Centralized monitoring and traffic visibility</li>
           </ul>
         </div>
       </div>
-
-      <div class="card" style="margin-bottom:28px;">
-        <h3>Technologies Used</h3>
-        <div class="grid grid-4" style="margin-top:10px;">
-          <div><strong style="font-size:13.5px;">Security</strong><ul><li>Palo Alto PAN-OS</li><li>Security zones &amp; policy</li><li>NAT / App-ID</li></ul></div>
-          <div><strong style="font-size:13.5px;">Networking</strong><ul><li>L2/L3 switching</li><li>802.1Q VLAN trunking</li><li>Static &amp; policy routing</li></ul></div>
-          <div><strong style="font-size:13.5px;">VPN</strong><ul><li>IKEv2</li><li>AES-256 / SHA-256</li><li>DH Group 14</li></ul></div>
-          <div><strong style="font-size:13.5px;">Cloud &amp; IaC</strong><ul><li>AWS VPC / EC2</li><li>IAM / CloudWatch</li><li>Terraform</li></ul></div>
-        </div>
-      </div>
-
-      <h3 style="margin-bottom:16px;">Project Evolution Roadmap</h3>
-      <div class="roadmap">
-        <div class="phase" data-n="1"><span class="phase-tag">Phase 1</span><h4>Palo Alto Firewall Foundation</h4><p>Stand up the NGFW, configure interfaces, zones, and NAT, and validate baseline internet access for the internal segment.</p></div>
-        <div class="phase" data-n="2"><span class="phase-tag">Phase 2</span><h4>Branch Office + Site-to-Site IPSEC VPN</h4><p>Deploy a second firewall at the branch and establish an encrypted IKEv2/IPSEC tunnel back to HQ.</p></div>
-        <div class="phase" data-n="3"><span class="phase-tag">Phase 3</span><h4>Switching + VLAN Segmentation</h4><p>Introduce trunked switching and separate Admin, Users, and Servers into dedicated VLANs.</p></div>
-        <div class="phase" data-n="4"><span class="phase-tag">Phase 4</span><h4>Security Zones + Firewall Policies</h4><p>Map VLANs to firewall zones and enforce least-privilege policy between them.</p></div>
-        <div class="phase" data-n="5"><span class="phase-tag">Phase 5</span><h4>Logging + Monitoring</h4><p>Centralize traffic, threat, and session logs; establish baseline dashboards and alerting.</p></div>
-        <div class="phase" data-n="6"><span class="phase-tag">Phase 6</span><h4>AWS Hybrid Cloud Migration</h4><p>Extend the on-prem trust boundary into an AWS VPC over IPSEC, hosting EC2 and database workloads.</p></div>
-        <div class="phase" data-n="7"><span class="phase-tag">Phase 7</span><h4>Terraform Infrastructure as Code</h4><p>Codify AWS (and where possible, network) configuration for repeatable, version-controlled deployment.</p></div>
-      </div>
     </section>
 
-    <!-- 2. NETWORK ARCHITECTURE -->
-    <section class="doc-section" id="architecture">
-      <div class="section-head"><span class="section-num">02</span><h2>Network Architecture Diagrams</h2></div>
-      <p class="section-intro">Logical topology for the four architecturally significant milestones of the build. Each diagram reflects the network as it exists at the end of the named phase.</p>
+    <!-- PHASE 0 -->
+    <section class="doc-section" id="phase0">
+      <div class="section-head"><div class="section-eyebrow">Phase 0 of 10</div><h2>Design Documentation</h2></div>
+      <p class="section-intro">Before any device is touched, the project gets a paper trail. Real engineers design on the whiteboard first — configuration is the last step, not the first.</p>
 
-      <div class="diagram-panel" style="margin-bottom:14px;">
+      <div class="subhead">Objective</div>
+      <p style="color:var(--ink-soft); max-width:68ch;">Establish a documentation structure that every later phase writes into, so the finished project is a portfolio artifact, not just a working lab.</p>
+
+      <div class="subhead">Design — Working Folder Structure</div>
+      <div class="tree">
+<span class="root">Enterprise-Infrastructure-Lab/</span>
+├── 01-Requirements           <span class="comment">// business case, scope</span>
+├── 02-Network-Diagrams       <span class="comment">// topology per phase</span>
+├── 03-IP-Addressing          <span class="comment">// subnet plans, allocation tables</span>
+├── 04-Firewall-Config        <span class="comment">// zones, NAT, policy exports</span>
+├── 05-Switch-Config          <span class="comment">// VLAN &amp; trunk configs</span>
+├── 06-VPN                    <span class="comment">// IKE / IPSEC parameters</span>
+├── 07-AWS-Migration          <span class="comment">// VPC design, Terraform</span>
+├── 08-Troubleshooting        <span class="comment">// test logs, known issues</span>
+└── 09-Lessons-Learned        <span class="comment">// retros per phase</span>
+      </div>
+
+      <div class="subhead">Documentation Output</div>
+      <p style="color:var(--ink-soft); max-width:68ch; margin:0;">This working structure, committed to version control alongside every diagram and config export produced in Phases 1–10.</p>
+
+      <details class="glossary" style="margin-top:26px;">
+        <summary><svg class="chev" width="10" height="10" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Glossary — jargon used in this document<span class="hint">click to expand</span></summary>
+        <dl class="glossary-grid">
+          <div><dt>CIDR (/24, /30…)</dt><dd>Shorthand for subnet size — the number after the slash is how many bits are the network portion; fewer bits free for hosts means a smaller subnet.</dd></div>
+          <div><dt>VLAN</dt><dd>A virtual LAN — splits one physical switch into multiple isolated broadcast domains.</dd></div>
+          <div><dt>Trunk</dt><dd>A switch port that carries traffic for multiple VLANs at once, tagged by VLAN ID.</dd></div>
+          <div><dt>Zone (Palo Alto)</dt><dd>A named group of interfaces/networks that security policy is written between, e.g. Trust → Untrust.</dd></div>
+          <div><dt>NAT</dt><dd>Network Address Translation — rewrites private IPs to a public IP for internet-bound traffic.</dd></div>
+          <div><dt>IKE / IPSEC</dt><dd>IKE negotiates a secure key exchange; IPSEC uses that key to encrypt the actual VPN traffic.</dd></div>
+          <div><dt>DH Group</dt><dd>Diffie-Hellman group — the mathematical strength of the key exchange; higher number, stronger key.</dd></div>
+          <div><dt>VPC</dt><dd>Virtual Private Cloud — an isolated, software-defined network inside AWS.</dd></div>
+          <div><dt>IAM</dt><dd>Identity and Access Management — controls who/what can do what inside AWS.</dd></div>
+          <div><dt>Policy Matrix</dt><dd>A source → destination → service → action table that defines every allowed firewall path explicitly.</dd></div>
+        </dl>
+      </details>
+    </section>
+
+    <!-- PHASE 1 -->
+    <section class="doc-section" id="phase1">
+      <div class="section-head"><div class="section-eyebrow">Phase 1 of 10</div><h2>Network Architecture Design</h2></div>
+      <p class="section-intro">The simplest version of the network that satisfies requirement one — secure internet access — before any segmentation is added.</p>
+
+      <div class="subhead">Objective</div>
+      <p style="color:var(--ink-soft); max-width:68ch;">Get a single site online through a hardened perimeter: internet → ISP router → firewall → internal LAN.</p>
+
+      <div class="subhead">Design — v1 Topology</div>
+      <div class="diagram-panel">
         <svg viewBox="0 0 560 300" width="100%" height="300">
           <line x1="280" y1="40" x2="280" y2="80" class="wire"/>
           <line x1="280" y1="120" x2="280" y2="160" class="wire"/>
           <line x1="280" y1="200" x2="280" y2="240" class="wire"/>
-          <g>
-            <ellipse cx="280" cy="28" rx="46" ry="16" class="box"/>
-            <text x="280" y="33" text-anchor="middle" font-size="12" font-weight="700">Internet</text>
-          </g>
-          <g>
-            <rect x="200" y="80" width="160" height="40" rx="6" class="box"/>
-            <text x="280" y="97" text-anchor="middle" font-size="12" font-weight="700">ISP Router</text>
-            <text x="280" y="112" text-anchor="middle" class="mono-label label-sub">203.0.113.1/30</text>
-          </g>
-          <g>
-            <rect x="180" y="160" width="200" height="44" rx="6" class="box box-accent"/>
-            <text x="280" y="179" text-anchor="middle" font-size="12" font-weight="700">Palo Alto Firewall</text>
-            <text x="280" y="195" text-anchor="middle" class="mono-label label-sub">WAN 203.0.113.2/30</text>
-          </g>
-          <g>
-            <rect x="230" y="240" width="100" height="38" rx="6" class="box"/>
-            <text x="280" y="264" text-anchor="middle" font-size="12" font-weight="700">PC</text>
-          </g>
+          <ellipse cx="280" cy="28" rx="46" ry="16" class="box"/>
+          <text x="280" y="33" text-anchor="middle" font-size="12" font-weight="700">Internet</text>
+          <rect x="200" y="80" width="160" height="40" rx="6" class="box"/>
+          <text x="280" y="97" text-anchor="middle" font-size="12" font-weight="700">ISP Router</text>
+          <text x="280" y="112" text-anchor="middle" class="mono-label label-sub">203.0.113.1/30</text>
+          <rect x="180" y="160" width="200" height="44" rx="6" class="box box-accent"/>
+          <text x="280" y="179" text-anchor="middle" font-size="12" font-weight="700">Palo Alto Firewall</text>
+          <text x="280" y="195" text-anchor="middle" class="mono-label label-sub">WAN 203.0.113.2/30</text>
+          <rect x="230" y="240" width="100" height="38" rx="6" class="box"/>
+          <text x="280" y="264" text-anchor="middle" font-size="12" font-weight="700">PC-1</text>
         </svg>
-        <div class="diagram-caption">PHASE 1 — Palo Alto Firewall Foundation</div>
+        <div class="diagram-caption">v1 — Internet → ISP Router → Palo Alto → Internal LAN</div>
       </div>
 
-      <div class="diagram-panel" style="margin-bottom:14px;">
-        <svg viewBox="0 0 640 300" width="100%" height="300">
-          <ellipse cx="320" cy="26" rx="46" ry="16" class="box"/>
-          <text x="320" y="31" text-anchor="middle" font-size="12" font-weight="700">Internet</text>
-          <line x1="180" y1="42" x2="320" y2="80" class="wire"/>
-          <line x1="460" y1="42" x2="320" y2="80" class="wire" style="display:none"/>
-          <line x1="320" y1="42" x2="180" y2="80" class="wire"/>
-          <line x1="320" y1="42" x2="460" y2="80" class="wire"/>
-
-          <rect x="100" y="80" width="160" height="46" rx="6" class="box box-accent"/>
-          <text x="180" y="100" text-anchor="middle" font-size="12" font-weight="700">HQ Palo Alto</text>
-          <text x="180" y="116" text-anchor="middle" class="mono-label label-sub">10.10.0.0/16</text>
-
-          <rect x="380" y="80" width="160" height="46" rx="6" class="box box-accent"/>
-          <text x="460" y="100" text-anchor="middle" font-size="12" font-weight="700">Branch Palo Alto</text>
-          <text x="460" y="116" text-anchor="middle" class="mono-label label-sub">10.20.0.0/16</text>
-
-          <line x1="260" y1="103" x2="380" y2="103" class="wire-vpn"/>
-          <text x="320" y="95" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--accent)">IPSEC VPN</text>
-
-          <line x1="180" y1="126" x2="180" y2="170" class="wire"/>
-          <rect x="110" y="170" width="140" height="36" rx="6" class="box"/>
-          <text x="180" y="192" text-anchor="middle" font-size="12" font-weight="700">HQ LAN</text>
-
-          <line x1="180" y1="206" x2="180" y2="244" class="wire"/>
-          <rect x="140" y="244" width="80" height="34" rx="6" class="box"/>
-          <text x="180" y="266" text-anchor="middle" font-size="12" font-weight="700">PC</text>
-        </svg>
-        <div class="diagram-caption">PHASE 2 — Branch Office + Site-to-Site IPSEC VPN</div>
-      </div>
-
-      <div class="diagram-panel" style="margin-bottom:14px;">
-        <svg viewBox="0 0 640 300" width="100%" height="300">
-          <rect x="270" y="20" width="100" height="38" rx="6" class="box box-accent"/>
-          <text x="320" y="44" text-anchor="middle" font-size="12" font-weight="700">Palo Alto</text>
-
-          <line x1="320" y1="58" x2="320" y2="96" class="wire"/>
-          <text x="336" y="80" font-size="10" class="label-sub">Trunk (802.1Q)</text>
-
-          <rect x="250" y="96" width="140" height="40" rx="6" class="box"/>
-          <text x="320" y="120" text-anchor="middle" font-size="12" font-weight="700">Switch</text>
-
-          <line x1="320" y1="136" x2="320" y2="156" class="wire"/>
-          <line x1="130" y1="156" x2="510" y2="156" class="wire"/>
-          <line x1="130" y1="156" x2="130" y2="176" class="wire"/>
-          <line x1="320" y1="156" x2="320" y2="176" class="wire"/>
-          <line x1="510" y1="156" x2="510" y2="176" class="wire"/>
-
-          <rect x="60" y="176" width="140" height="76" rx="6" class="box" style="stroke:var(--zone-trust)"/>
-          <text x="130" y="200" text-anchor="middle" font-size="12" font-weight="700">VLAN 10</text>
-          <text x="130" y="216" text-anchor="middle" font-size="11" fill="var(--zone-trust)">Admin</text>
-          <text x="130" y="234" text-anchor="middle" class="mono-label label-sub">10.10.10.0/24</text>
-
-          <rect x="250" y="176" width="140" height="76" rx="6" class="box" style="stroke:var(--zone-server)"/>
-          <text x="320" y="200" text-anchor="middle" font-size="12" font-weight="700">VLAN 20</text>
-          <text x="320" y="216" text-anchor="middle" font-size="11" fill="var(--zone-server)">Users</text>
-          <text x="320" y="234" text-anchor="middle" class="mono-label label-sub">10.10.20.0/24</text>
-
-          <rect x="440" y="176" width="140" height="76" rx="6" class="box" style="stroke:var(--zone-dmz)"/>
-          <text x="510" y="200" text-anchor="middle" font-size="12" font-weight="700">VLAN 30</text>
-          <text x="510" y="216" text-anchor="middle" font-size="11" fill="var(--zone-dmz)">Servers</text>
-          <text x="510" y="234" text-anchor="middle" class="mono-label label-sub">10.10.30.0/24</text>
-        </svg>
-        <div class="diagram-caption">PHASE 3 — Switching + VLAN Segmentation</div>
-      </div>
-
-      <div class="diagram-panel">
-        <svg viewBox="0 0 640 300" width="100%" height="300">
-          <rect x="60" y="60" width="160" height="46" rx="6" class="box"/>
-          <text x="140" y="80" text-anchor="middle" font-size="12" font-weight="700">On-prem Network</text>
-          <text x="140" y="96" text-anchor="middle" class="mono-label label-sub">10.10.0.0/16</text>
-
-          <line x1="140" y1="106" x2="140" y2="140" class="wire"/>
-          <rect x="70" y="140" width="140" height="40" rx="6" class="box box-accent"/>
-          <text x="140" y="165" text-anchor="middle" font-size="12" font-weight="700">Palo Alto</text>
-
-          <line x1="210" y1="160" x2="430" y2="160" class="wire-vpn"/>
-          <text x="320" y="150" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--accent)">IPSEC VPN</text>
-
-          <rect x="430" y="140" width="150" height="40" rx="6" class="box box-accent"/>
-          <text x="505" y="165" text-anchor="middle" font-size="12" font-weight="700">AWS VPC</text>
-
-          <line x1="505" y1="180" x2="505" y2="214" class="wire"/>
-          <rect x="420" y="214" width="170" height="52" rx="6" class="box"/>
-          <text x="505" y="236" text-anchor="middle" font-size="12" font-weight="700">EC2 / Database</text>
-          <text x="505" y="252" text-anchor="middle" class="mono-label label-sub">10.100.1.0/24 · 10.100.2.0/24</text>
-        </svg>
-        <div class="diagram-caption">PHASE 6 — AWS Hybrid Cloud Migration</div>
-      </div>
+      <div class="subhead">Documentation Output</div>
+      <p style="color:var(--ink-soft); max-width:68ch; margin:0;">Network Diagram v1 (above), saved to <code>02-Network-Diagrams</code>.</p>
     </section>
 
-    <!-- 3. IP ADDRESSING PLAN -->
-    <section class="doc-section" id="ip-plan">
-      <div class="section-head"><span class="section-num">03</span><h2>IP Addressing Plan</h2></div>
-      <p class="section-intro">Structured addressing keeps route summarization simple and leaves headroom in every segment for growth without renumbering.</p>
+    <!-- PHASE 2 -->
+    <section class="doc-section" id="phase2">
+      <div class="section-head"><div class="section-eyebrow">Phase 2 of 10</div><h2>IP Address Design</h2></div>
+      <p class="section-intro">Addressing is planned on paper before it's typed into a device — every subnet size is a deliberate choice, not a default.</p>
 
-      <div class="table-wrap" style="margin-bottom:20px;">
+      <div class="subhead">Design — WAN Link</div>
+      <p style="color:var(--ink-soft); max-width:68ch;">The ISP hand-off is a point-to-point link between the ISP router and the firewall's WAN interface.</p>
+      <div class="why-box"><strong>Why a /30?</strong>A point-to-point link only ever has two devices on it. A /30 gives exactly 2 usable addresses — no wasted space, and it signals to anyone reading the plan that this is a transit link, not a LAN.</div>
+      <div class="table-wrap" style="margin-bottom:26px;">
         <table>
-          <thead><tr><th>WAN Link</th><th>Device</th><th>Address</th></tr></thead>
+          <thead><tr><th>Device</th><th>Interface</th><th>IP Address</th></tr></thead>
           <tbody>
-            <tr><td>ISP hand-off</td><td>ISP Router</td><td class="mono">203.0.113.1/30</td></tr>
-            <tr><td>HQ edge</td><td>Palo Alto WAN interface</td><td class="mono">203.0.113.2/30</td></tr>
+            <tr><td>ISP Router</td><td class="mono">—</td><td class="mono">203.0.113.1/30</td></tr>
+            <tr><td>Palo Alto</td><td class="mono">ethernet1/1 (WAN)</td><td class="mono">203.0.113.2/30</td></tr>
           </tbody>
         </table>
       </div>
 
-      <div class="table-wrap" style="margin-bottom:20px;">
+      <div class="subhead">Design — LAN Network</div>
+      <p style="color:var(--ink-soft); max-width:68ch;">A single private block is reserved for the whole company, then broken into function-based subnets.</p>
+      <div class="why-box"><strong>Why a /16 for 50 employees?</strong>50 people don't need 65,000 addresses today — but re-numbering a live network later is painful. A /16 (<abbr title="Classless Inter-Domain Routing">CIDR</abbr> <code>10.10.0.0/16</code>) leaves headroom to add sites, VLANs, and device classes for years without ever touching this decision again.</div>
+
+      <div class="table-wrap" style="margin-bottom:26px;">
         <table>
-          <thead><tr><th>HQ Segment</th><th>Purpose</th><th>Subnet</th></tr></thead>
+          <thead><tr><th>Segment</th><th>Purpose</th><th>Subnet</th></tr></thead>
           <tbody>
             <tr><td colspan="3" style="font-family:var(--font-mono); color:var(--ink); font-weight:700; background:var(--surface-2);">Network: 10.10.0.0/16</td></tr>
-            <tr><td>Management</td><td>Firewall, switch, AP mgmt</td><td class="mono">10.10.10.0/24</td></tr>
-            <tr><td>Users</td><td>Corporate workstations</td><td class="mono">10.10.20.0/24</td></tr>
-            <tr><td>Servers</td><td>Internal application servers</td><td class="mono">10.10.30.0/24</td></tr>
+            <tr><td>Management</td><td>Firewall, switch, AP mgmt interfaces</td><td class="mono">10.10.10.0/24</td></tr>
+            <tr><td>Users</td><td>Employee workstations</td><td class="mono">10.10.20.0/24</td></tr>
+            <tr><td>Servers</td><td>Internal application &amp; file servers</td><td class="mono">10.10.30.0/24</td></tr>
             <tr><td>Guest</td><td>Untrusted guest Wi-Fi</td><td class="mono">10.10.40.0/24</td></tr>
           </tbody>
         </table>
@@ -575,52 +457,43 @@
       <div class="grid grid-2">
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Branch</th><th>Subnet</th></tr></thead>
-            <tbody><tr><td>Branch network</td><td class="mono">10.20.0.0/16</td></tr></tbody>
-          </table>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>AWS</th><th>CIDR</th></tr></thead>
+            <thead><tr><th>Firewall Interface</th><th>IP</th></tr></thead>
             <tbody>
-              <tr><td>VPC</td><td class="mono">10.100.0.0/16</td></tr>
-              <tr><td>Public subnet</td><td class="mono">10.100.1.0/24</td></tr>
-              <tr><td>Private subnet</td><td class="mono">10.100.2.0/24</td></tr>
+              <tr><td class="mono">ethernet1/1 (WAN)</td><td class="mono">203.0.113.2</td></tr>
+              <tr><td class="mono">ethernet1/2 (LAN)</td><td class="mono">10.10.10.1</td></tr>
             </tbody>
           </table>
         </div>
+        <div class="card">
+          <h3 style="font-size:13.5px;">Example End-Host Config — PC-1</h3>
+          <div class="log-card" style="margin-top:8px;">
+            <div class="row"><span class="k">IP</span><span class="v">10.10.20.10</span></div>
+            <div class="row"><span class="k">Subnet</span><span class="v">255.255.255.0</span></div>
+            <div class="row"><span class="k">Gateway</span><span class="v">10.10.20.1</span></div>
+            <div class="row"><span class="k">DNS</span><span class="v">8.8.8.8</span></div>
+          </div>
+        </div>
       </div>
+
+      <div class="subhead">Documentation Output</div>
+      <p style="color:var(--ink-soft); max-width:68ch; margin:0;">IP Address Spreadsheet (tables above), saved to <code>03-IP-Addressing</code>.</p>
     </section>
 
-    <!-- 4. FIREWALL DESIGN -->
-    <section class="doc-section" id="firewall">
-      <div class="section-head"><span class="section-num">04</span><h2>Firewall Design</h2></div>
-      <p class="section-intro">Zones map directly to VLAN segments; policy between them defaults to deny and is opened only for required, explicitly defined services.</p>
+    <!-- PHASE 3 -->
+    <section class="doc-section" id="phase3">
+      <div class="section-head"><div class="section-eyebrow">Phase 3 of 10</div><h2>Firewall Design</h2></div>
+      <p class="section-intro">Zones come before rules. Every rule that follows references one of these four named groups — nothing is written ad hoc.</p>
 
+      <div class="subhead">Design — Security Zones</div>
       <div class="grid grid-4" style="margin-bottom:28px;">
-        <div class="card zone-card" style="--zc:var(--zone-untrust); --zc-soft:var(--zone-untrust-soft);">
-          <span class="zone-tag">UNTRUST</span>
-          <h3>Internet</h3>
-          <p>Public, unauthenticated networks. Default posture: deny inbound, App-ID controlled outbound.</p>
-        </div>
-        <div class="card zone-card" style="--zc:var(--zone-server); --zc-soft:var(--zone-server-soft);">
-          <span class="zone-tag">TRUST</span>
-          <h3>Users</h3>
-          <p>Corporate endpoints (VLAN 20). Outbound internet allowed; access to Servers restricted by service.</p>
-        </div>
-        <div class="card zone-card" style="--zc:var(--zone-trust); --zc-soft:var(--zone-trust-soft);">
-          <span class="zone-tag">SERVER</span>
-          <h3>Internal Servers</h3>
-          <p>Application and data tier (VLAN 30). Accepts only explicitly permitted services from Trust.</p>
-        </div>
-        <div class="card zone-card" style="--zc:var(--zone-dmz); --zc-soft:var(--zone-dmz-soft);">
-          <span class="zone-tag">DMZ</span>
-          <h3>Public Applications</h3>
-          <p>Internet-facing services isolated from both Trust and Server zones.</p>
-        </div>
+        <div class="card zone-card" style="--zc:var(--zone-untrust); --zc-soft:var(--zone-untrust-soft);"><span class="zone-tag">UNTRUST</span><h3>Internet</h3><p>Public, unauthenticated networks. Deny inbound by default.</p></div>
+        <div class="card zone-card" style="--zc:var(--zone-server); --zc-soft:var(--zone-server-soft);"><span class="zone-tag">TRUST</span><h3>Employee Network</h3><p>Corporate endpoints. Outbound allowed, inbound restricted.</p></div>
+        <div class="card zone-card" style="--zc:var(--zone-trust); --zc-soft:var(--zone-trust-soft);"><span class="zone-tag">SERVER</span><h3>Internal Services</h3><p>Application/data tier. Accepts only explicitly permitted services.</p></div>
+        <div class="card zone-card" style="--zc:var(--zone-dmz); --zc-soft:var(--zone-dmz-soft);"><span class="zone-tag">DMZ</span><h3>Public Services</h3><p>Internet-facing apps, isolated from Trust and Server.</p></div>
       </div>
 
-      <h3 style="margin-bottom:14px;">Security Policy Matrix</h3>
+      <div class="subhead">Design — Security Policy Matrix</div>
+      <p style="color:var(--ink-soft); max-width:68ch;">Never create rules ad hoc — every path the network allows is written down first, in one table, before it's typed into the box.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Source</th><th>Destination</th><th>Service</th><th>Action</th></tr></thead>
@@ -632,69 +505,230 @@
           </tbody>
         </table>
       </div>
+
+      <div class="subhead">Documentation Output</div>
+      <p style="color:var(--ink-soft); max-width:68ch; margin:0;">Firewall Rule Matrix (above), saved to <code>04-Firewall-Config</code>.</p>
     </section>
 
-    <!-- 5. VPN DESIGN -->
-    <section class="doc-section" id="vpn">
-      <div class="section-head"><span class="section-num">05</span><h2>VPN Design</h2></div>
-      <p class="section-intro">A route-based IPSEC tunnel secures HQ-to-branch traffic using current, non-deprecated IKEv2 cryptographic standards.</p>
+    <!-- PHASE 4 -->
+    <section class="doc-section" id="phase4">
+      <div class="section-head"><div class="section-eyebrow">Phase 4 of 10</div><h2>Implementation &amp; Testing</h2></div>
+      <p class="section-intro">Only now — after requirements, topology, addressing, zones, and policy are all on paper — does the firewall get touched.</p>
 
-      <div class="grid grid-4" style="margin-bottom:22px;">
-        <div class="card"><h3 class="mono" style="font-size:14px;">IKEv2</h3><p>Key exchange protocol; supports MOBIKE and faster rekeying than IKEv1.</p></div>
-        <div class="card"><h3 class="mono" style="font-size:14px;">AES-256</h3><p>Symmetric encryption for the data-plane ESP payload.</p></div>
-        <div class="card"><h3 class="mono" style="font-size:14px;">SHA-256</h3><p>Hash algorithm for integrity verification (HMAC).</p></div>
-        <div class="card"><h3 class="mono" style="font-size:14px;">DH Group 14</h3><p>2048-bit Diffie-Hellman group for Phase 1 key material.</p></div>
+      <div class="subhead">Configuration Tasks — build order</div>
+      <ol class="step-list">
+        <li><h4>Configure interfaces</h4><p>Assign <code>ethernet1/1</code> (WAN) and <code>ethernet1/2</code> (LAN) the addresses from the Phase 2 IP plan.</p></li>
+        <li><h4>Assign zones</h4><p>Bind each interface to its Phase 3 zone — WAN → Untrust, LAN → Trust.</p></li>
+        <li><h4>Configure the virtual router</h4><p>Create the routing instance that owns both interfaces.</p></li>
+        <li><h4>Configure the default route</h4><p><code>0.0.0.0/0</code> next hop <code>203.0.113.1</code> — sends all unmatched traffic to the ISP.</p></li>
+        <li><h4>Create security rules</h4><p>Enter the Phase 3 policy matrix into the rulebase, top to bottom, in order.</p></li>
+        <li><h4>Create NAT</h4><p>Source-NAT internal subnets to the WAN IP so private addresses can reach the internet.</p></li>
+      </ol>
+
+      <div class="subhead" style="margin-top:36px;">Validation Tests</div>
+      <p style="color:var(--ink-soft); max-width:68ch;">Engineers don't say "looks good" — they test, and they compare the result against what they predicted.</p>
+      <div class="grid grid-2">
+        <div>
+          <div class="term-title">From PC-1</div>
+          <div class="term">
+<span class="c2">$</span> ping 10.10.20.1<span class="c1"> &nbsp;# gateway</span><br>
+<span class="c2">$</span> ping 8.8.8.8<span class="c1"> &nbsp;# internet</span>
+          </div>
+        </div>
+        <div>
+          <div class="term-title">Expected — Palo Alto Traffic Monitor</div>
+          <div class="log-card">
+            <div class="row"><span class="k">Source</span><span class="v">10.10.20.10</span></div>
+            <div class="row"><span class="k">Destination</span><span class="v">8.8.8.8</span></div>
+            <div class="row"><span class="k">Action</span><span class="v allow">allow</span></div>
+          </div>
+        </div>
       </div>
 
+      <div class="subhead" style="margin-top:36px;">Documentation Output</div>
+      <p style="color:var(--ink-soft); max-width:68ch; margin:0;">Firewall config export + traffic monitor screenshots, saved to <code>04-Firewall-Config</code> and <code>08-Troubleshooting</code>.</p>
+    </section>
+
+    <!-- PHASE 5 -->
+    <section class="doc-section" id="phase5">
+      <div class="section-head"><div class="section-eyebrow">Phase 5 of 10</div><h2>Branch Office Expansion</h2></div>
+      <p class="section-intro">Requirement four — a connected branch — moves the design from a single site to two, joined by an encrypted tunnel.</p>
+
+      <div class="subhead">Design — Two-Site Topology</div>
       <div class="diagram-panel">
-        <svg viewBox="0 0 560 160" width="100%" height="160">
-          <rect x="20" y="55" width="150" height="50" rx="6" class="box box-accent"/>
-          <text x="95" y="76" text-anchor="middle" font-size="12" font-weight="700">HQ Network</text>
-          <text x="95" y="92" text-anchor="middle" class="mono-label label-sub">10.10.0.0/16</text>
-
-          <line x1="170" y1="80" x2="390" y2="80" class="wire-vpn"/>
-          <text x="280" y="65" text-anchor="middle" font-size="11" font-weight="700" fill="var(--accent)">VPN Tunnel</text>
-          <text x="280" y="98" text-anchor="middle" class="mono-label label-sub">IKEv2 · AES-256 · SHA-256 · DH14</text>
-
-          <rect x="390" y="55" width="150" height="50" rx="6" class="box box-accent"/>
-          <text x="465" y="76" text-anchor="middle" font-size="12" font-weight="700">Branch Network</text>
-          <text x="465" y="92" text-anchor="middle" class="mono-label label-sub">10.20.0.0/16</text>
+        <svg viewBox="0 0 640 260" width="100%" height="260">
+          <ellipse cx="320" cy="26" rx="46" ry="16" class="box"/>
+          <text x="320" y="31" text-anchor="middle" font-size="12" font-weight="700">Internet</text>
+          <line x1="320" y1="42" x2="180" y2="80" class="wire"/>
+          <line x1="320" y1="42" x2="460" y2="80" class="wire"/>
+          <rect x="100" y="80" width="160" height="46" rx="6" class="box box-accent"/>
+          <text x="180" y="100" text-anchor="middle" font-size="12" font-weight="700">HQ Palo Alto</text>
+          <text x="180" y="116" text-anchor="middle" class="mono-label label-sub">10.10.0.0/16</text>
+          <rect x="380" y="80" width="160" height="46" rx="6" class="box box-accent"/>
+          <text x="460" y="100" text-anchor="middle" font-size="12" font-weight="700">Branch Palo Alto</text>
+          <text x="460" y="116" text-anchor="middle" class="mono-label label-sub">10.20.0.0/16</text>
+          <line x1="260" y1="103" x2="380" y2="103" class="wire-vpn"/>
+          <text x="320" y="95" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--accent)">IPSEC Tunnel</text>
+          <text x="320" y="145" text-anchor="middle" class="mono-label label-sub">tunnel.1  10.255.0.1 ↔ 10.255.0.2</text>
+          <line x1="180" y1="126" x2="180" y2="170" class="wire"/>
+          <rect x="110" y="170" width="140" height="36" rx="6" class="box"/>
+          <text x="180" y="192" text-anchor="middle" font-size="12" font-weight="700">HQ LAN</text>
+          <line x1="460" y1="126" x2="460" y2="170" class="wire"/>
+          <rect x="390" y="170" width="140" height="36" rx="6" class="box"/>
+          <text x="460" y="192" text-anchor="middle" font-size="12" font-weight="700">Branch LAN</text>
         </svg>
-        <div class="diagram-caption">SITE-TO-SITE TUNNEL — HQ ↔ Branch</div>
+        <div class="diagram-caption">v2 — HQ and Branch joined by a routed VPN tunnel</div>
       </div>
-    </section>
 
-    <!-- 6. VLAN DESIGN -->
-    <section class="doc-section" id="vlan">
-      <div class="section-head"><span class="section-num">06</span><h2>VLAN Design</h2></div>
-      <p class="section-intro">Four VLANs separate traffic by function at Layer 2, enforced at Layer 3 by the firewall's zone policy.</p>
-
+      <div class="subhead">IP Plan</div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>VLAN</th><th>Name</th><th>Subnet</th><th>Zone</th></tr></thead>
+          <thead><tr><th>Site / Interface</th><th>Network / Address</th></tr></thead>
           <tbody>
-            <tr><td class="mono">10</td><td><span class="swatch" style="background:var(--zone-trust)"></span>Management</td><td class="mono">10.10.10.0/24</td><td class="mono">TRUST</td></tr>
-            <tr><td class="mono">20</td><td><span class="swatch" style="background:var(--zone-server)"></span>Users</td><td class="mono">10.10.20.0/24</td><td class="mono">TRUST</td></tr>
-            <tr><td class="mono">30</td><td><span class="swatch" style="background:var(--zone-dmz)"></span>Servers</td><td class="mono">10.10.30.0/24</td><td class="mono">SERVER</td></tr>
-            <tr><td class="mono">40</td><td><span class="swatch" style="background:var(--zone-untrust)"></span>Guest</td><td class="mono">10.10.40.0/24</td><td class="mono">UNTRUST</td></tr>
+            <tr><td>HQ network</td><td class="mono">10.10.0.0/16</td></tr>
+            <tr><td>Branch network</td><td class="mono">10.20.0.0/16</td></tr>
+            <tr><td>Tunnel interface — HQ</td><td class="mono">10.255.0.1</td></tr>
+            <tr><td>Tunnel interface — Branch</td><td class="mono">10.255.0.2</td></tr>
           </tbody>
         </table>
       </div>
+
+      <div class="subhead">Configuration Tasks</div>
+      <ul class="check-list" data-phase>
+        <li><input type="checkbox" id="p5-1"><label for="p5-1">Provision second Palo Alto for the branch site</label></li>
+        <li><input type="checkbox" id="p5-2"><label for="p5-2">Assign tunnel interface addresses (10.255.0.1 / .2)</label></li>
+        <li><input type="checkbox" id="p5-3"><label for="p5-3">Add static route toward the branch subnet via the tunnel</label></li>
+      </ul>
+
+      <div class="subhead">Documentation Output</div>
+      <p style="color:var(--ink-soft); max-width:68ch; margin:0;">Network Diagram v2 (above) + updated IP Address Spreadsheet.</p>
     </section>
 
-    <!-- 7. CLOUD MIGRATION -->
-    <section class="doc-section" id="cloud">
-      <div class="section-head"><span class="section-num">07</span><h2>Cloud Migration Design</h2></div>
-      <p class="section-intro">On-prem services are lifted into a segmented AWS VPC, replacing implicit network trust with explicit, auditable controls.</p>
+    <!-- PHASE 6 -->
+    <section class="doc-section" id="phase6">
+      <div class="section-head"><div class="section-eyebrow">Phase 6 of 10</div><h2>IPSEC VPN Design</h2></div>
+      <p class="section-intro">The cryptographic parameters for the tunnel introduced in Phase 5 — defined on paper before either firewall's VPN wizard is opened.</p>
 
-      <div class="migration">
+      <div class="subhead">Design — IKE (Phase 1) Parameters</div>
+      <div class="grid grid-4" style="margin-bottom:20px;">
+        <div class="card"><h4 class="mono">IKEv2</h4><p>Key exchange version — faster rekeying than IKEv1, native MOBIKE support.</p></div>
+        <div class="card"><h4 class="mono">AES-256</h4><p>Symmetric encryption for the negotiated key material.</p></div>
+        <div class="card"><h4 class="mono">SHA-256</h4><p>Integrity hash (HMAC) for the exchange.</p></div>
+        <div class="card"><h4 class="mono">DH Group 14</h4><p>2048-bit Diffie-Hellman group for Phase 1 key strength.</p></div>
+      </div>
+
+      <div class="subhead">Design — IPSEC (Phase 2) Parameters</div>
+      <div class="table-wrap" style="margin-bottom:20px;">
+        <table>
+          <thead><tr><th>Parameter</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td>Encryption</td><td class="mono">AES-256</td></tr>
+            <tr><td>Authentication</td><td class="mono">SHA-256</td></tr>
+            <tr><td>Lifetime</td><td class="mono">3600 seconds</td></tr>
+            <tr><td>Traffic selector</td><td class="mono">10.10.0.0/16 ↔ 10.20.0.0/16</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="why-box"><strong>Why re-key every hour?</strong>A shorter IPSEC lifetime limits how much traffic is ever encrypted under one key — if a key were somehow compromised, the exposure window is capped at 3600 seconds, not the life of the tunnel.</div>
+
+      <div class="subhead">Configuration Tasks</div>
+      <ul class="check-list" data-phase>
+        <li><input type="checkbox" id="p6-1"><label for="p6-1">Configure IKE gateway (peer IP, PSK, IKEv2 profile)</label></li>
+        <li><input type="checkbox" id="p6-2"><label for="p6-2">Configure IPSEC tunnel + traffic selectors</label></li>
+        <li><input type="checkbox" id="p6-3"><label for="p6-3">Bind tunnel interface to the virtual router</label></li>
+        <li><input type="checkbox" id="p6-4"><label for="p6-4">Test tunnel — verify Phase 1 and Phase 2 come up</label></li>
+      </ul>
+
+      <div class="subhead" style="margin-top:30px;">Validation Tests</div>
+      <div class="term">
+<span class="c3">#</span> IKE Phase 1 / Phase 2 negotiation logs<br>
+<span class="c3">#</span> Tunnel status — expect: <span class="c1">up</span><br>
+<span class="c3">#</span> Route table — confirm 10.20.0.0/16 via tunnel.1
+      </div>
+
+      <div class="subhead" style="margin-top:30px;">Documentation Output</div>
+      <p style="color:var(--ink-soft); max-width:68ch; margin:0;">VPN Design Document (this section), saved to <code>06-VPN</code>.</p>
+    </section>
+
+    <!-- PHASE 7 -->
+    <section class="doc-section" id="phase7">
+      <div class="section-head"><div class="section-eyebrow">Phase 7 of 10</div><h2>Switching &amp; VLAN Design</h2></div>
+      <p class="section-intro">Requirement two — segmentation — gets a physical (well, virtual) home. A switch joins the firewall and splits the LAN by function.</p>
+
+      <div class="subhead">Design — Topology</div>
+      <div class="diagram-panel">
+        <svg viewBox="0 0 640 300" width="100%" height="300">
+          <rect x="270" y="20" width="100" height="38" rx="6" class="box box-accent"/>
+          <text x="320" y="44" text-anchor="middle" font-size="12" font-weight="700">Palo Alto</text>
+          <line x1="320" y1="58" x2="320" y2="96" class="wire"/>
+          <text x="336" y="80" font-size="10" class="label-sub">Trunk (802.1Q)</text>
+          <rect x="250" y="96" width="140" height="40" rx="6" class="box"/>
+          <text x="320" y="120" text-anchor="middle" font-size="12" font-weight="700">Switch</text>
+          <line x1="320" y1="136" x2="320" y2="156" class="wire"/>
+          <line x1="130" y1="156" x2="510" y2="156" class="wire"/>
+          <line x1="130" y1="156" x2="130" y2="176" class="wire"/>
+          <line x1="320" y1="156" x2="320" y2="176" class="wire"/>
+          <line x1="510" y1="156" x2="510" y2="176" class="wire"/>
+          <rect x="60" y="176" width="140" height="76" rx="6" class="box" style="stroke:var(--zone-trust)"/>
+          <text x="130" y="200" text-anchor="middle" font-size="12" font-weight="700">VLAN 10</text>
+          <text x="130" y="216" text-anchor="middle" font-size="11" fill="var(--zone-trust)">Management</text>
+          <text x="130" y="234" text-anchor="middle" class="mono-label label-sub">10.10.10.0/24</text>
+          <rect x="250" y="176" width="140" height="76" rx="6" class="box" style="stroke:var(--zone-server)"/>
+          <text x="320" y="200" text-anchor="middle" font-size="12" font-weight="700">VLAN 20</text>
+          <text x="320" y="216" text-anchor="middle" font-size="11" fill="var(--zone-server)">Users</text>
+          <text x="320" y="234" text-anchor="middle" class="mono-label label-sub">10.10.20.0/24</text>
+          <rect x="440" y="176" width="140" height="76" rx="6" class="box" style="stroke:var(--zone-dmz)"/>
+          <text x="510" y="200" text-anchor="middle" font-size="12" font-weight="700">VLAN 30</text>
+          <text x="510" y="216" text-anchor="middle" font-size="11" fill="var(--zone-dmz)">Servers</text>
+          <text x="510" y="234" text-anchor="middle" class="mono-label label-sub">10.10.30.0/24</text>
+        </svg>
+        <div class="diagram-caption">Palo Alto trunk → switch → per-function VLANs</div>
+      </div>
+
+      <div class="subhead">VLAN Plan</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>VLAN</th><th>Purpose</th><th>Network</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">10</td><td><span class="swatch" style="background:var(--zone-trust)"></span>Management</td><td class="mono">10.10.10.0/24</td></tr>
+            <tr><td class="mono">20</td><td><span class="swatch" style="background:var(--zone-server)"></span>Users</td><td class="mono">10.10.20.0/24</td></tr>
+            <tr><td class="mono">30</td><td><span class="swatch" style="background:var(--zone-dmz)"></span>Servers</td><td class="mono">10.10.30.0/24</td></tr>
+            <tr><td class="mono">40</td><td><span class="swatch" style="background:var(--zone-untrust)"></span>Guest</td><td class="mono">10.10.40.0/24</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="subhead">Configuration Tasks</div>
+      <ul class="check-list" data-phase>
+        <li><input type="checkbox" id="p7-1"><label for="p7-1">Create VLANs 10 / 20 / 30 / 40 on the switch</label></li>
+        <li><input type="checkbox" id="p7-2"><label for="p7-2">Configure the switch-to-firewall link as an 802.1Q trunk</label></li>
+        <li><input type="checkbox" id="p7-3"><label for="p7-3">Assign access ports to their VLAN</label></li>
+        <li><input type="checkbox" id="p7-4"><label for="p7-4">Create a firewall subinterface per VLAN, mapped to its zone</label></li>
+      </ul>
+
+      <div class="subhead" style="margin-top:30px;">Validation Tests</div>
+      <div class="term">
+<span class="c2">$</span> show vlan brief<br>
+<span class="c2">$</span> show interfaces trunk<br>
+<span class="c2">$</span> ping <span class="c1"># same-VLAN host reachable, cross-VLAN blocked unless policy allows it</span>
+      </div>
+
+      <div class="subhead" style="margin-top:30px;">Documentation Output</div>
+      <p style="color:var(--ink-soft); max-width:68ch; margin:0;">VLAN Plan (above) + switch config export, saved to <code>05-Switch-Config</code>.</p>
+    </section>
+
+    <!-- PHASE 8 -->
+    <section class="doc-section" id="phase8">
+      <div class="section-head"><div class="section-eyebrow">Phase 8 of 10</div><h2>Cloud Migration</h2></div>
+      <p class="section-intro">Requirement five. The on-prem trust boundary extends into AWS over the same class of encrypted tunnel used for the branch.</p>
+
+      <div class="subhead">Design — Before / After</div>
+      <div class="migration" style="margin-bottom:26px;">
         <div class="col before">
           <div class="col-label">Before</div>
           <ul><li><span class="dot"></span>On-prem servers only</li></ul>
         </div>
-        <div class="arrow">
-          <svg width="26" height="26" viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
+        <div class="arrow"><svg width="26" height="26" viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="col after">
           <div class="col-label">After</div>
           <ul>
@@ -702,114 +736,128 @@
             <li><span class="dot"></span>EC2 compute instances</li>
             <li><span class="dot"></span>Private database subnet</li>
             <li><span class="dot"></span>Security Groups (host-level firewalling)</li>
-            <li><span class="dot"></span>IAM (least-privilege identity)</li>
+            <li><span class="dot"></span><abbr title="Identity and Access Management">IAM</abbr> (least-privilege identity)</li>
             <li><span class="dot"></span>CloudWatch (metrics &amp; alarms)</li>
           </ul>
         </div>
       </div>
-    </section>
 
-    <!-- 8. IMPLEMENTATION CHECKLIST -->
-    <section class="doc-section" id="checklist">
-      <div class="section-head"><span class="section-num">08</span><h2>Implementation Checklist</h2></div>
-      <p class="section-intro">Build sequence for the lab, phase by phase. Progress is tracked locally in the header as items are checked off.</p>
-
-      <details class="collapse" open>
-        <summary>
-          <svg class="chev" width="10" height="10" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>
-          Phase 1 — Palo Alto Firewall Foundation
-          <span class="phase-progress" data-phase-progress>0/5</span>
-        </summary>
-        <div class="collapse-body">
-          <ul class="check-list" data-phase>
-            <li><input type="checkbox" id="p1-1"><label for="p1-1">Install Palo Alto VM</label></li>
-            <li><input type="checkbox" id="p1-2"><label for="p1-2">Configure interfaces</label></li>
-            <li><input type="checkbox" id="p1-3"><label for="p1-3">Configure zones</label></li>
-            <li><input type="checkbox" id="p1-4"><label for="p1-4">Configure NAT</label></li>
-            <li><input type="checkbox" id="p1-5"><label for="p1-5">Test internet access</label></li>
-          </ul>
-        </div>
-      </details>
-
-      <details class="collapse">
-        <summary>
-          <svg class="chev" width="10" height="10" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>
-          Phase 2 — Branch Office + Site-to-Site IPSEC VPN
-          <span class="phase-progress" data-phase-progress>0/4</span>
-        </summary>
-        <div class="collapse-body">
-          <ul class="check-list" data-phase>
-            <li><input type="checkbox" id="p2-1"><label for="p2-1">Configure second firewall</label></li>
-            <li><input type="checkbox" id="p2-2"><label for="p2-2">Configure IKE</label></li>
-            <li><input type="checkbox" id="p2-3"><label for="p2-3">Configure IPSEC</label></li>
-            <li><input type="checkbox" id="p2-4"><label for="p2-4">Test tunnel</label></li>
-          </ul>
-        </div>
-      </details>
-    </section>
-
-    <!-- 9. TESTING & TROUBLESHOOTING -->
-    <section class="doc-section" id="testing">
-      <div class="section-head"><span class="section-num">09</span><h2>Testing &amp; Troubleshooting</h2></div>
-      <p class="section-intro">Standard verification steps at each layer — reachability, policy, and tunnel state — used to isolate faults during the build.</p>
-
-      <div class="grid grid-3">
-        <div>
-          <div class="term-title">Connectivity Tests</div>
-          <div class="term">
-<span class="c2">$</span> ping 10.10.30.10<br>
-<span class="c2">$</span> traceroute 8.8.8.8<br>
-<span class="c2">$</span> nslookup internal-app.corp.local
-          </div>
-        </div>
-        <div>
-          <div class="term-title">Firewall Troubleshooting</div>
-          <div class="term">
-<span class="c3">#</span> Traffic logs<br>
-<span class="c3">#</span> Session browser<br>
-<span class="c3">#</span> Packet capture (dataplane)
-          </div>
-        </div>
-        <div>
-          <div class="term-title">VPN Troubleshooting</div>
-          <div class="term">
-<span class="c1">*</span> IKE Phase 1/2 logs<br>
-<span class="c1">*</span> Tunnel status (up/down)<br>
-<span class="c1">*</span> Route table verification
-          </div>
-        </div>
+      <div class="diagram-panel" style="margin-bottom:26px;">
+        <svg viewBox="0 0 640 260" width="100%" height="260">
+          <rect x="60" y="50" width="160" height="46" rx="6" class="box"/>
+          <text x="140" y="70" text-anchor="middle" font-size="12" font-weight="700">On-prem Network</text>
+          <text x="140" y="86" text-anchor="middle" class="mono-label label-sub">10.10.0.0/16</text>
+          <line x1="140" y1="96" x2="140" y2="130" class="wire"/>
+          <rect x="70" y="130" width="140" height="40" rx="6" class="box box-accent"/>
+          <text x="140" y="155" text-anchor="middle" font-size="12" font-weight="700">Palo Alto</text>
+          <line x1="210" y1="150" x2="430" y2="150" class="wire-vpn"/>
+          <text x="320" y="140" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--accent)">IPSEC VPN</text>
+          <rect x="430" y="130" width="150" height="40" rx="6" class="box box-accent"/>
+          <text x="505" y="155" text-anchor="middle" font-size="12" font-weight="700">AWS VPC</text>
+          <line x1="505" y1="170" x2="505" y2="200" class="wire"/>
+          <rect x="410" y="200" width="190" height="46" rx="6" class="box"/>
+          <text x="505" y="220" text-anchor="middle" font-size="12" font-weight="700">EC2 / Database</text>
+          <text x="505" y="236" text-anchor="middle" class="mono-label label-sub">10.100.1.0/24 · .2.0/24 · .3.0/24</text>
+        </svg>
+        <div class="diagram-caption">On-prem ↔ AWS over IPSEC — same design pattern as Phase 5/6</div>
       </div>
+
+      <div class="subhead">AWS IP Plan</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Resource</th><th>CIDR</th></tr></thead>
+          <tbody>
+            <tr><td>VPC</td><td class="mono">10.100.0.0/16</td></tr>
+            <tr><td>Public subnet</td><td class="mono">10.100.1.0/24</td></tr>
+            <tr><td>Private subnet</td><td class="mono">10.100.2.0/24</td></tr>
+            <tr><td>Database subnet</td><td class="mono">10.100.3.0/24</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="subhead">Configuration Tasks</div>
+      <ul class="check-list" data-phase>
+        <li><input type="checkbox" id="p8-1"><label for="p8-1">Create VPC + public/private/database subnets</label></li>
+        <li><input type="checkbox" id="p8-2"><label for="p8-2">Create Internet Gateway + NAT Gateway</label></li>
+        <li><input type="checkbox" id="p8-3"><label for="p8-3">Configure the on-prem ↔ AWS VPN connection</label></li>
+        <li><input type="checkbox" id="p8-4"><label for="p8-4">Define Security Groups per tier</label></li>
+        <li><input type="checkbox" id="p8-5"><label for="p8-5">Create least-privilege IAM roles</label></li>
+        <li><input type="checkbox" id="p8-6"><label for="p8-6">Enable CloudWatch metrics &amp; alarms</label></li>
+      </ul>
+
+      <div class="subhead" style="margin-top:30px;">Validation Tests</div>
+      <div class="term">
+<span class="c2">$</span> ssh ec2-user@10.100.2.10 <span class="c1"># reachable only via VPN, not public internet</span><br>
+<span class="c3">#</span> Confirm database port is unreachable from 0.0.0.0/0<br>
+<span class="c3">#</span> Confirm CloudWatch shows live EC2 metrics
+      </div>
+
+      <div class="subhead" style="margin-top:30px;">Documentation Output</div>
+      <p style="color:var(--ink-soft); max-width:68ch; margin:0;">AWS Architecture Diagram (above) + Security Group matrix, saved to <code>07-AWS-Migration</code>.</p>
     </section>
 
-    <!-- 10. FUTURE IMPROVEMENTS -->
-    <section class="doc-section" id="future" style="border-bottom:none;">
-      <div class="section-head"><span class="section-num">10</span><h2>Future Improvements</h2></div>
-      <p class="section-intro">Planned iterations that move the lab from a manually built environment toward a fully automated, observable infrastructure.</p>
+    <!-- PHASE 9 -->
+    <section class="doc-section" id="phase9">
+      <div class="section-head"><div class="section-eyebrow">Phase 9 of 10</div><h2>Infrastructure as Code</h2></div>
+      <p class="section-intro">Everything built by hand in Phase 8 gets rebuilt as code, so the AWS environment can be destroyed and recreated identically on demand.</p>
 
-      <div class="grid grid-3">
-        <div class="card"><h3>Terraform</h3><p>Full IaC coverage for AWS VPC, EC2, IAM, and security group resources.</p></div>
-        <div class="card"><h3>AWS CLI</h3><p>Scripted provisioning and teardown for repeatable lab resets.</p></div>
-        <div class="card"><h3>Python Automation</h3><p>PAN-OS XML API scripting for policy validation and drift detection.</p></div>
-        <div class="card"><h3>CI/CD</h3><p>Pipeline-driven Terraform plan/apply with peer-reviewed changes.</p></div>
-        <div class="card"><h3>Monitoring Dashboard</h3><p>Unified view of firewall, VPN, and cloud metrics via CloudWatch + Grafana.</p></div>
+      <div class="subhead">Design — Terraform-Managed Resources</div>
+      <div class="grid grid-3" style="margin-bottom:8px;">
+        <div class="card"><h4>Networking</h4><ul><li>VPC</li><li>Subnets</li><li>Route tables</li></ul></div>
+        <div class="card"><h4>Security</h4><ul><li>Security Groups</li><li>IAM roles &amp; policies</li></ul></div>
+        <div class="card"><h4>Compute</h4><ul><li>EC2 instances</li><li>Key pairs</li></ul></div>
       </div>
+
+      <div class="subhead">Configuration Tasks</div>
+      <ul class="check-list" data-phase>
+        <li><input type="checkbox" id="p9-1"><label for="p9-1">Write <code>main.tf</code> covering VPC, subnets, routes</label></li>
+        <li><input type="checkbox" id="p9-2"><label for="p9-2">Parameterize with <code>variables.tf</code> (CIDRs, region, instance size)</label></li>
+        <li><input type="checkbox" id="p9-3"><label for="p9-3">Configure remote state (S3 + lock table)</label></li>
+        <li><input type="checkbox" id="p9-4"><label for="p9-4"><code>terraform plan</code> reviewed, then <code>apply</code></label></li>
+      </ul>
+
+      <div class="subhead" style="margin-top:30px;">Validation Tests</div>
+      <div class="term">
+<span class="c2">$</span> terraform plan<span class="c1"> &nbsp;# expect: no diff after a clean apply — proves idempotency</span>
+      </div>
+
+      <div class="subhead" style="margin-top:30px;">Documentation Output</div>
+      <p style="color:var(--ink-soft); max-width:68ch; margin:0;">Terraform repository with a README describing every resource, saved to <code>07-AWS-Migration</code>.</p>
+    </section>
+
+    <!-- PHASE 10 -->
+    <section class="doc-section" id="phase10" style="border-bottom:none;">
+      <div class="section-head"><div class="section-eyebrow">Phase 10 of 10</div><h2>Documentation Deliverables</h2></div>
+      <p class="section-intro">The finished portfolio artifact — everything produced across Phases 0–9, assembled into one deliverable set.</p>
+
+      <ul class="check-list" data-phase>
+        <li><input type="checkbox" id="p10-1"><label for="p10-1">Network Diagrams (v1 → v2 → cloud)</label></li>
+        <li><input type="checkbox" id="p10-2"><label for="p10-2">IP Address Spreadsheet</label></li>
+        <li><input type="checkbox" id="p10-3"><label for="p10-3">Firewall Rule Matrix</label></li>
+        <li><input type="checkbox" id="p10-4"><label for="p10-4">VPN Design Document</label></li>
+        <li><input type="checkbox" id="p10-5"><label for="p10-5">AWS Architecture Diagram</label></li>
+        <li><input type="checkbox" id="p10-6"><label for="p10-6">Terraform Repository</label></li>
+        <li><input type="checkbox" id="p10-7"><label for="p10-7">Troubleshooting Guide</label></li>
+      </ul>
+
+      <div class="why-box" style="margin-top:24px;"><strong>Why this matters</strong>A recruiter skimming a GitHub profile sees the difference immediately: a repo with configs and no rationale reads as tutorial-following, while requirements → design → IP plan → policy → validation → docs, repeated across eleven phases, reads as how the work actually happened.</div>
     </section>
   </main>
 </div>
 
-<footer>Enterprise Network &amp; Hybrid Cloud Infrastructure Lab — Design Documentation · Built for portfolio &amp; lab reference</footer>
+<footer>Enterprise Network → Hybrid Cloud Infrastructure — Engineering Design Documentation · Example Corp reference build</footer>
 
 <script>
 (function(){
   var toggle = document.getElementById('navToggle');
   var sidebar = document.getElementById('sidebar');
   toggle.addEventListener('click', function(){ sidebar.classList.toggle('open'); });
-  document.querySelectorAll('#sideNav a').forEach(function(a){
+  document.querySelectorAll('#sideNav a, .sidebar nav a').forEach(function(a){
     a.addEventListener('click', function(){ sidebar.classList.remove('open'); });
   });
 
   var sections = Array.prototype.slice.call(document.querySelectorAll('section.doc-section'));
-  var links = Array.prototype.slice.call(document.querySelectorAll('#sideNav a'));
+  var links = Array.prototype.slice.call(document.querySelectorAll('.sidebar nav a'));
   var byId = {};
   links.forEach(function(l){ byId[l.getAttribute('href').slice(1)] = l; });
 
@@ -830,18 +878,11 @@
   var allBoxes = Array.prototype.slice.call(document.querySelectorAll('.check-list input[type="checkbox"]'));
   var progressLabel = document.getElementById('progressLabel');
   var progressBar = document.getElementById('progressBar');
-  var phaseGroups = Array.prototype.slice.call(document.querySelectorAll('[data-phase]'));
 
   function updateProgress(){
     var total = allBoxes.length, done = allBoxes.filter(function(b){ return b.checked; }).length;
     progressLabel.textContent = done + ' / ' + total + ' tasks';
     progressBar.style.width = (total ? (done/total*100) : 0) + '%';
-    phaseGroups.forEach(function(group){
-      var boxes = Array.prototype.slice.call(group.querySelectorAll('input[type="checkbox"]'));
-      var d = boxes.filter(function(b){ return b.checked; }).length;
-      var summary = group.closest('details').querySelector('[data-phase-progress]');
-      if(summary) summary.textContent = d + '/' + boxes.length;
-    });
   }
   allBoxes.forEach(function(b){ b.addEventListener('change', updateProgress); });
   updateProgress();
