@@ -246,6 +246,14 @@
   .log-card .v{ color:var(--ink); }
   .log-card .v.allow{ color:var(--ok); font-weight:700; }
 
+  /* Storyboard */
+  .storyboard{ display:flex; gap:12px; overflow-x:auto; padding:4px 2px 16px; margin-bottom:6px; -webkit-overflow-scrolling:touch; }
+  .storyboard .frame{ flex:none; width:200px; }
+  .storyboard .frame .diagram-panel{ padding:10px 6px 8px; }
+  .storyboard .frame svg{ display:block; margin:0 auto; width:100%; height:150px; min-width:0; }
+  .storyboard .frame .fnum{ font-family:var(--font-mono); font-size:10px; color:var(--accent); font-weight:700; margin-bottom:2px; }
+  .storyboard .frame .fcap{ text-align:center; font-family:var(--font-mono); font-size:10.3px; color:var(--ink-faint); margin-top:7px; line-height:1.4; }
+
   /* VPC illustrated map */
   .vpc-map{ position:relative; border:2px dashed var(--accent); border-radius:14px; padding:28px 16px 16px;
     background:radial-gradient(circle, var(--line) 1px, transparent 1px) 0 0/18px 18px, var(--surface); margin-bottom:8px; }
@@ -448,6 +456,87 @@
           <tr><td>Palo Alto Firewall · 203.0.113.2/30</td><td>VM-Series EC2 instance (AWS Marketplace), Elastic IP on its untrust ENI</td></tr>
           <tr><td>PC-1</td><td>A small EC2 instance in the private/LAN subnet, no public IP</td></tr>
         </tbody></table>
+      </div>
+
+      <div class="subhead">Watch it get built, frame by frame</div>
+      <p class="lead">Five snapshots of the same picture, each one adding what the next group of tasks below actually creates. Scroll sideways.</p>
+      <div class="storyboard">
+
+        <div class="frame">
+          <div class="diagram-panel"><svg class="dg" viewBox="0 0 200 170">
+            <rect x="14" y="24" width="172" height="130" rx="10" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 4"/>
+            <text x="100" y="14" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--accent)">VPC · 10.10.0.0/16</text>
+            <text x="100" y="94" text-anchor="middle" font-size="10.5" fill="var(--ink-faint)">empty —</text>
+            <text x="100" y="108" text-anchor="middle" font-size="10.5" fill="var(--ink-faint)">nothing built yet</text>
+          </svg></div>
+          <div class="fnum">TASK 1</div><div class="fcap">Create the VPC — one boundary, nothing inside it yet</div>
+        </div>
+
+        <div class="frame">
+          <div class="diagram-panel"><svg class="dg" viewBox="0 0 200 170">
+            <rect x="14" y="24" width="172" height="130" rx="10" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 4"/>
+            <text x="100" y="14" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--accent)">VPC · 10.10.0.0/16</text>
+            <rect x="24" y="60" width="72" height="82" rx="7" class="box" style="stroke:var(--zone-dmz)"/>
+            <text x="60" y="76" text-anchor="middle" font-size="9.5" font-weight="700" fill="var(--zone-dmz)">public-wan</text>
+            <text x="60" y="90" text-anchor="middle" class="mono-label label-sub" font-size="8.5">10.10.1.0/24</text>
+            <rect x="104" y="60" width="72" height="82" rx="7" class="box" style="stroke:var(--zone-trust)"/>
+            <text x="140" y="76" text-anchor="middle" font-size="9.5" font-weight="700" fill="var(--zone-trust)">private-lan</text>
+            <text x="140" y="90" text-anchor="middle" class="mono-label label-sub" font-size="8.5">10.10.20.0/24</text>
+          </svg></div>
+          <div class="fnum">TASK 2</div><div class="fcap">Two rooms added — one will face the street, one won't</div>
+        </div>
+
+        <div class="frame">
+          <div class="diagram-panel"><svg class="dg" viewBox="0 0 200 170">
+            <ellipse cx="100" cy="16" rx="32" ry="12" class="box"/>
+            <use href="#i-cloud" x="88" y="6" width="14" height="14" class="dicon"/>
+            <text x="100" y="20" text-anchor="middle" font-size="8" font-weight="700">Internet</text>
+            <line x1="100" y1="28" x2="100" y2="40" class="wire"/>
+            <rect x="14" y="40" width="172" height="114" rx="10" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 4"/>
+            <rect x="24" y="68" width="72" height="76" rx="7" class="box" style="stroke:var(--zone-dmz)"/>
+            <text x="60" y="84" text-anchor="middle" font-size="9" font-weight="700" fill="var(--zone-dmz)">public-wan</text>
+            <line x1="60" y1="68" x2="100" y2="40" class="wire-vpn"/>
+            <rect x="104" y="68" width="72" height="76" rx="7" class="box" style="stroke:var(--zone-trust)"/>
+            <text x="140" y="84" text-anchor="middle" font-size="9" font-weight="700" fill="var(--zone-trust)">private-lan</text>
+            <text x="140" y="118" text-anchor="middle" font-size="16" fill="var(--ink-faint)">?</text>
+          </svg></div>
+          <div class="fnum">TASKS 3–4</div><div class="fcap">Internet Gateway attached, public room routed to it. Private room's route waits for the firewall.</div>
+        </div>
+
+        <div class="frame">
+          <div class="diagram-panel"><svg class="dg" viewBox="0 0 200 170">
+            <rect x="14" y="24" width="172" height="130" rx="10" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 4"/>
+            <rect x="24" y="52" width="72" height="90" rx="7" class="box" style="stroke:var(--zone-dmz)"/>
+            <text x="60" y="66" text-anchor="middle" font-size="8.5" font-weight="700" fill="var(--zone-dmz)">public-wan</text>
+            <use href="#i-shield" x="42" y="76" width="20" height="20" class="dicon"/>
+            <text x="60" y="112" text-anchor="middle" font-size="8" font-weight="700">hq-palo-alto</text>
+            <text x="60" y="124" text-anchor="middle" class="mono-label label-sub" font-size="7.5">eth0 mgmt · eth1 untrust</text>
+            <rect x="104" y="52" width="72" height="90" rx="7" class="box" style="stroke:var(--zone-trust)"/>
+            <text x="140" y="66" text-anchor="middle" font-size="8.5" font-weight="700" fill="var(--zone-trust)">private-lan</text>
+            <line x1="62" y1="90" x2="118" y2="90" class="wire"/>
+            <circle cx="118" cy="90" r="3" fill="var(--zone-trust)"/>
+            <text x="140" y="106" text-anchor="middle" font-size="7.5" font-weight="700">eth2 trust</text>
+          </svg></div>
+          <div class="fnum">TASKS 5–6</div><div class="fcap">Firewall launched with 3 interfaces — one reaches into the private room</div>
+        </div>
+
+        <div class="frame">
+          <div class="diagram-panel"><svg class="dg" viewBox="0 0 200 170">
+            <rect x="14" y="24" width="172" height="130" rx="10" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 4"/>
+            <rect x="24" y="52" width="72" height="90" rx="7" class="box" style="stroke:var(--zone-dmz)"/>
+            <use href="#i-shield" x="42" y="60" width="18" height="18" class="dicon"/>
+            <use href="#i-lock" x="24" y="118" width="12" height="12" class="dicon" style="stroke:var(--warn)"/>
+            <text x="60" y="140" text-anchor="middle" font-size="7" fill="var(--warn)">443/22 ← you only</text>
+            <text x="60" y="95" text-anchor="middle" class="mono-label label-sub" font-size="7">EIP 16.208.x.x</text>
+            <rect x="104" y="52" width="72" height="90" rx="7" class="box" style="stroke:var(--zone-trust)"/>
+            <line x1="62" y1="80" x2="118" y2="80" class="wire"/>
+            <circle cx="118" cy="80" r="3" fill="var(--zone-trust)"/>
+            <text x="140" y="100" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--zone-trust)">forwarding: ON</text>
+            <text x="140" y="112" text-anchor="middle" font-size="7" fill="var(--ink-faint)">src/dest check off</text>
+          </svg></div>
+          <div class="fnum">TASKS 7–9</div><div class="fcap">Public IP assigned, forwarding enabled, and the gate only opens for you</div>
+        </div>
+
       </div>
 
       <ul class="check-list" data-phase>
