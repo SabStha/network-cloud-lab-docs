@@ -240,6 +240,7 @@
         </li>
         <li>
           <input type="checkbox" id="p1-6"><label for="p1-6">Attach 3 network interfaces to the firewall<span class="task-note">management (admin access), untrust/WAN (public subnet), trust/LAN (private subnet)</span></label>
+          <div class="why-box"><strong>Learned the hard way — read this before attaching anything</strong>AWS <em>always</em> makes the very first interface attached to the instance (device index 0, the one created automatically at launch in Step 5) PAN-OS's <strong>Management</strong> port — no matter what subnet it's in, what you name it, or what Elastic IP you put on it. It is never <code>ethernet1/1</code>, and it can never carry zone/NAT traffic. If you only attach 2 interfaces total (thinking "management" + "trust"), you end up with Management + <code>ethernet1/1</code> and no real untrust interface at all — the symptom is <code>ethernet1/1</code> stuck at DHCP state "Selecting", IP <code>0.0.0.0</code> forever, and a commit error like <code>can't find interface in 'default' for next hop ...</code>. You need <strong>3 attached interfaces, full stop</strong>: the launch-time one (management), plus two more you create in this step (untrust, trust).</div>
           <div class="step-illustration"><div class="diagram-panel"><svg class="dg" viewBox="0 0 200 150">
             <rect x="14" y="18" width="172" height="118" rx="10" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 4"/>
             <rect x="24" y="34" width="72" height="94" rx="7" class="box" style="stroke:var(--zone-dmz)"/>
@@ -348,13 +349,16 @@
           <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
             <div class="howto-body"><ol>
               <li>Browse to <code>https://&lt;management Elastic IP&gt;</code>, click through the self-signed cert warning, log in</li>
-              <li><strong>Network &rarr; Interfaces &rarr; ethernet1/1</strong>: Interface Type <strong>Layer3</strong> &middot; Security Zone: create new zone <code>untrust</code> &middot; IPv4 tab: <strong>DHCP Client</strong> (AWS assigns the private IP via DHCP, not a static address)</li>
-              <li><strong>ethernet1/2</strong>: same, Security Zone: create new zone <code>trust</code> &middot; IPv4: <strong>DHCP Client</strong></li>
-              <li><strong>Network &rarr; Virtual Routers &rarr; default</strong>: add both interfaces</li>
-              <li>Same screen, <strong>Static Routes</strong> tab &rarr; Add: <code>0.0.0.0/0</code>, Next Hop = your public subnet's gateway IP &mdash; in AWS this is always the subnet's <code>.1</code> address (e.g. <code>10.10.1.1</code>), not a literal router like the on-prem <code>203.0.113.1</code></li>
-              <li><strong>Policies &rarr; NAT</strong> &rarr; Add: Source Zone <code>trust</code>, Destination Zone <code>untrust</code> &middot; Translated Packet tab: Source Address Translation &rarr; Dynamic IP and Port &rarr; Interface Address &rarr; <code>ethernet1/1</code></li>
+              <li><strong>Before configuring anything:</strong> confirm which physical interface is really which. <strong>Device &rarr; Setup &rarr; Interfaces &rarr; Management &rarr; Show DHCP Client Runtime Info</strong> &mdash; the IP it shows there belongs to whichever ENI you attached first at launch. That one is Management, permanently. Your other two ENIs are <code>ethernet1/1</code> and <code>ethernet1/2</code>, in the order you attached them.</li>
+              <li><strong>Network &rarr; Interfaces &rarr; ethernet1/1</strong>: Interface Type <strong>Layer3</strong> &middot; Security Zone: create new zone (<code>untrust</code> or <code>trust</code>, matching whichever subnet this physical interface actually sits in) &middot; IPv4 tab: <strong>DHCP Client</strong></li>
+              <li><strong>ethernet1/2</strong>: same, zone = whichever one you didn't use above &middot; IPv4: <strong>DHCP Client</strong></li>
+              <li>On each interface's <strong>Config</strong> tab, explicitly set <strong>Virtual Router: default</strong> &mdash; don't rely only on adding them from the Virtual Router side, set it here too</li>
+              <li><strong>Commit now, before adding the static route.</strong> PAN-OS interfaces don't actually request a DHCP lease until something commits successfully &mdash; if you add the route in the same commit as the interface config, the route can fail validation because the interface doesn't have a live IP yet ("can't find interface in 'default' for next hop ..."). Commit the interfaces alone first.</li>
+              <li>Once that commit succeeds, check <strong>Network &rarr; Interfaces</strong> &mdash; both should now show real IP addresses, not "dynamic-dhcp" with nothing filled in</li>
+              <li><strong>Network &rarr; Virtual Routers &rarr; default &rarr; Static Routes</strong> &rarr; Add: <code>0.0.0.0/0</code>, Next Hop = your public subnet's gateway IP &mdash; in AWS this is always the subnet's <code>.1</code> address (e.g. <code>10.10.1.1</code>), not a literal router like the on-prem <code>203.0.113.1</code></li>
+              <li><strong>Policies &rarr; NAT</strong> &rarr; Add: Source Zone <code>trust</code>, Destination Zone <code>untrust</code> &middot; Translated Packet tab: Source Address Translation &rarr; Dynamic IP and Port &rarr; Interface Address &rarr; whichever interface is actually your untrust one</li>
               <li><strong>Policies &rarr; Security</strong> &rarr; enter the Phase 3 policy matrix, top to bottom</li>
-              <li>Click <strong>Commit</strong> (top right) &mdash; nothing above takes effect until you commit</li>
+              <li>Click <strong>Commit</strong> again &mdash; nothing above takes effect until you commit</li>
             </ol></div>
           </details>
         </li>
