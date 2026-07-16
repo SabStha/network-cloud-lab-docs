@@ -96,17 +96,62 @@
         </tbody></table>
       </div>
 
-      <div class="subhead">Configuration tasks</div>
+      <div class="subhead">How to build this — AWS lab</div>
+      <p class="lead">AWS has no physical switch and no 802.1Q trunk to configure — there's nothing to plug a VLAN into. The concept still applies, it just moves to a different layer.</p>
+      <div class="why-box"><strong>Where did the VLANs go?</strong>In AWS, "VLANs" become extra <strong>subnets</strong>. Instead of a switch tagging frames by VLAN ID, each department gets its own subnet, and every one of those subnets routes through the same firewall interface. The firewall's <strong>security policy</strong> — not a switch trunk — is what actually keeps Guest traffic from reaching Servers.</div>
+
       <ul class="check-list" data-phase>
-        <li><input type="checkbox" id="p7-1"><label for="p7-1">Create VLANs 10 / 20 / 30 / 40 on the switch</label></li>
-        <li><input type="checkbox" id="p7-2"><label for="p7-2">Configure the switch-to-firewall link as an 802.1Q trunk</label></li>
-        <li><input type="checkbox" id="p7-3"><label for="p7-3">Assign access ports to their VLAN</label></li>
-        <li><input type="checkbox" id="p7-4"><label for="p7-4">Create a firewall subinterface per VLAN, mapped to its zone</label></li>
+        <li>
+          <input type="checkbox" id="p7-1"><label for="p7-1">Create the remaining department subnets<span class="task-note">Management 10.10.10.0/24 and Guest 10.10.40.0/24 are new — Users (10.10.20.0/24) already exists from Phase 1</span></label>
+          <div class="step-illustration"><div class="diagram-panel"><svg class="dg" viewBox="0 0 200 150">
+            <rect x="6" y="18" width="188" height="118" rx="10" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 4"/>
+            <rect x="14" y="46" width="42" height="80" rx="6" class="box" style="stroke:var(--zone-trust)"/>
+            <text x="35" y="60" text-anchor="middle" font-size="7" font-weight="700" fill="var(--zone-trust)">Mgmt</text>
+            <text x="35" y="72" text-anchor="middle" class="mono-label label-sub" font-size="6.3">.10.0/24</text>
+            <rect x="60" y="46" width="42" height="80" rx="6" class="box" style="stroke:var(--zone-server)"/>
+            <text x="81" y="60" text-anchor="middle" font-size="7" font-weight="700" fill="var(--zone-server)">Users</text>
+            <text x="81" y="72" text-anchor="middle" class="mono-label label-sub" font-size="6.3">.20.0/24</text>
+            <rect x="106" y="46" width="42" height="80" rx="6" class="box" style="stroke:var(--zone-dmz)"/>
+            <text x="127" y="60" text-anchor="middle" font-size="7" font-weight="700" fill="var(--zone-dmz)">Servers</text>
+            <text x="127" y="72" text-anchor="middle" class="mono-label label-sub" font-size="6.3">.30.0/24</text>
+            <rect x="152" y="46" width="42" height="80" rx="6" class="box" style="stroke:var(--zone-untrust)"/>
+            <text x="173" y="60" text-anchor="middle" font-size="7" font-weight="700" fill="var(--zone-untrust)">Guest</text>
+            <text x="173" y="72" text-anchor="middle" class="mono-label label-sub" font-size="6.3">.40.0/24</text>
+          </svg></div><div class="fcap">Four subnets standing in for four VLANs — same HQ VPC, no switch required.</div></div>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>VPC Console &rarr; Subnets &rarr; Create subnet, VPC <code>enterprise-lab-vpc</code></li>
+              <li>Subnet &mdash; Name <code>hq-management</code>, IPv4 CIDR <code>10.10.10.0/24</code></li>
+              <li>Subnet &mdash; Name <code>hq-servers</code>, IPv4 CIDR <code>10.10.30.0/24</code></li>
+              <li>Subnet &mdash; Name <code>hq-guest</code>, IPv4 CIDR <code>10.10.40.0/24</code></li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p7-2"><label for="p7-2">Route each new subnet through the firewall's trust interface<span class="task-note">this is the AWS equivalent of trunking — every subnet's default path leads to the same firewall</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>VPC Console &rarr; Route Tables &rarr; create one route table per new subnet (e.g. <code>hq-management-rt</code>, <code>hq-servers-rt</code>, <code>hq-guest-rt</code>)</li>
+              <li>Each one: add route <code>0.0.0.0/0</code> &rarr; Target: Network Interface &rarr; the firewall's trust ENI</li>
+              <li>Associate each route table with its matching subnet</li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p7-3"><label for="p7-3">Write security policy between the new segments<span class="task-note">this replaces the switch trunk as the actual enforcement point</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>In PAN-OS: <strong>Policies &rarr; Security</strong> &rarr; Add rules matching by source subnet, e.g. <code>10.10.40.0/24</code> (Guest) &rarr; Internet only, deny everything internal</li>
+              <li><code>10.10.20.0/24</code> (Users) &rarr; <code>10.10.30.0/24</code> (Servers), HTTPS only &mdash; same policy already written in Phase 3</li>
+              <li>Commit, then test: a host in Guest should <em>not</em> be able to reach a host in Servers</li>
+            </ol></div>
+          </details>
+        </li>
       </ul>
 
-      <div class="subhead">Validation tests</div>
-      <div class="term"><span class="c2">$</span> show vlan brief<br><span class="c2">$</span> show interfaces trunk<br><span class="c2">$</span> ping <span class="c1">\\ same-VLAN reachable, cross-VLAN blocked unless policy allows it</span></div>
-    
+      <div class="subhead" style="margin-top:30px;">Validation tests</div>
+      <div class="term"><span class="c2">$</span> ping <span class="c1">\\ from a Guest-subnet host to a Servers-subnet host — expect: blocked</span><br><span class="c2">$</span> ping <span class="c1">\\ from a Users-subnet host to a Servers-subnet host on 443 — expect: allowed</span><br><span class="c3">#</span> PAN-OS Traffic Monitor confirms which policy rule matched each attempt</div>
+
     </div>
   </div>
 
