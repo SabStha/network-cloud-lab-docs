@@ -100,19 +100,102 @@
         </tbody></table>
       </div>
 
-      <div class="subhead">Configuration tasks</div>
+      <div class="subhead">How to build this — AWS lab</div>
+      <p class="lead">HQ is technically already in AWS from Phase 1 — but in this lab it stands in for "on-prem." This phase adds a genuinely separate third VPC for cloud workloads, connected back to HQ the same way the branch was: an independent network, joined only by a tunnel.</p>
+      <div class="why-box"><strong>Why AWS's own VPN Gateway this time, not a third Palo Alto?</strong>You could deploy a third firewall here, same as Branch — but a common real pattern once you're already inside AWS is to let AWS terminate the tunnel natively (a Virtual Private Gateway) and lean on Security Groups for the workload-level filtering instead. Both are valid; this phase deliberately shows the other way, so you've built both.</div>
+
       <ul class="check-list" data-phase>
-        <li><input type="checkbox" id="p8-1"><label for="p8-1">Create VPC + public/private/database subnets</label></li>
-        <li><input type="checkbox" id="p8-2"><label for="p8-2">Create Internet Gateway + NAT Gateway</label></li>
-        <li><input type="checkbox" id="p8-3"><label for="p8-3">Configure the on-prem ↔ AWS VPN connection</label></li>
-        <li><input type="checkbox" id="p8-4"><label for="p8-4">Define Security Groups per tier</label></li>
-        <li><input type="checkbox" id="p8-5"><label for="p8-5">Create least-privilege IAM roles</label></li>
-        <li><input type="checkbox" id="p8-6"><label for="p8-6">Enable CloudWatch metrics &amp; alarms</label></li>
+        <li>
+          <input type="checkbox" id="p8-1"><label for="p8-1">Create the cloud VPC and its three subnets<span class="task-note">10.100.0.0/16, split into public / private / database</span></label>
+          <div class="step-illustration"><div class="diagram-panel"><svg class="dg" viewBox="0 0 200 150">
+            <rect x="10" y="18" width="180" height="118" rx="10" fill="none" stroke="var(--cat-cloud)" stroke-width="2" stroke-dasharray="5 4"/>
+            <text x="100" y="10" text-anchor="middle" font-size="10" font-weight="700" fill="var(--cat-cloud)">cloud-vpc &middot; 10.100.0.0/16</text>
+            <rect x="18" y="46" width="52" height="80" rx="6" class="box" style="stroke:var(--zone-dmz)"/>
+            <text x="44" y="60" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--zone-dmz)">public</text>
+            <text x="44" y="72" text-anchor="middle" class="mono-label label-sub" font-size="6.8">.1.0/24</text>
+            <rect x="74" y="46" width="52" height="80" rx="6" class="box" style="stroke:var(--zone-server)"/>
+            <text x="100" y="60" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--zone-server)">private</text>
+            <text x="100" y="72" text-anchor="middle" class="mono-label label-sub" font-size="6.8">.2.0/24</text>
+            <rect x="130" y="46" width="52" height="80" rx="6" class="box" style="stroke:var(--cat-database)"/>
+            <use href="#i-database" x="146" y="54" width="16" height="16" class="dicon" style="stroke:var(--cat-database)"/>
+            <text x="156" y="86" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--cat-database)">database</text>
+            <text x="156" y="98" text-anchor="middle" class="mono-label label-sub" font-size="6.8">.3.0/24</text>
+          </svg></div><div class="fcap">Three tiers: internet-facing, app servers, and a database that never gets a public IP.</div></div>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>VPC Console &rarr; Create VPC &rarr; Name <code>cloud-vpc</code>, CIDR <code>10.100.0.0/16</code></li>
+              <li>Create 3 subnets: <code>cloud-public</code> (10.100.1.0/24), <code>cloud-private</code> (10.100.2.0/24), <code>cloud-database</code> (10.100.3.0/24)</li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p8-2"><label for="p8-2">Create an Internet Gateway and a NAT Gateway<span class="task-note">IGW for the public subnet; NAT lets private/database subnets reach the internet for updates without being reachable from it</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>VPC Console &rarr; Internet Gateways &rarr; Create &rarr; attach to <code>cloud-vpc</code></li>
+              <li>VPC Console &rarr; NAT Gateways &rarr; Create &rarr; Subnet: <code>cloud-public</code> &middot; Allocate a new Elastic IP for it</li>
+              <li>Public route table: <code>0.0.0.0/0</code> &rarr; Internet Gateway</li>
+              <li>Private &amp; database route tables: <code>0.0.0.0/0</code> &rarr; the NAT Gateway (outbound only, nothing can initiate inbound)</li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p8-3"><label for="p8-3">Create the Site-to-Site VPN connection back to HQ<span class="task-note">Virtual Private Gateway + Customer Gateway pointing at HQ's Palo Alto Elastic IP</span></label>
+          <div class="step-illustration"><div class="diagram-panel"><svg class="dg" viewBox="0 0 200 150">
+            <rect x="10" y="55" width="75" height="40" rx="6" class="box box-accent"/>
+            <use href="#i-shield" x="18" y="63" width="16" height="16" class="dicon"/>
+            <text x="47" y="88" text-anchor="middle" font-size="7.5" font-weight="700">HQ Firewall</text>
+            <rect x="115" y="55" width="75" height="40" rx="6" class="box" style="stroke:var(--cat-cloud);"/>
+            <text x="152" y="72" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--cat-cloud)">Virtual Private</text>
+            <text x="152" y="84" text-anchor="middle" font-size="7.5" font-weight="700" fill="var(--cat-cloud)">Gateway</text>
+            <line x1="85" y1="75" x2="115" y2="75" class="wire-vpn"/>
+          </svg></div><div class="fcap">This time AWS itself is the tunnel endpoint on the cloud side, not another firewall.</div></div>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>VPC Console &rarr; Virtual Private Gateways &rarr; Create &rarr; attach to <code>cloud-vpc</code></li>
+              <li>VPC Console &rarr; Customer Gateways &rarr; Create &rarr; IP address: HQ Palo Alto's Elastic IP &middot; Routing: Static</li>
+              <li>VPC Console &rarr; Site-to-Site VPN Connections &rarr; Create &rarr; select the Virtual Private Gateway and Customer Gateway above</li>
+              <li>Static IP routes: <code>10.10.0.0/16</code> (HQ's network)</li>
+              <li>Download the configuration file &mdash; it contains 2 tunnel endpoints + pre-shared keys you'll enter into HQ's Palo Alto as a new IKE Gateway / IPSec Tunnel, same pattern as Phase 6</li>
+              <li>Enable <strong>Route Propagation</strong> on the private &amp; database route tables so AWS auto-adds the HQ route once the tunnel is up</li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p8-4"><label for="p8-4">Define Security Groups per tier<span class="task-note">public SG: HTTPS from internet. private SG: only from public tier. database SG: only from private tier</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li><code>cloud-public-sg</code>: inbound HTTPS(443) from 0.0.0.0/0</li>
+              <li><code>cloud-private-sg</code>: inbound from <code>cloud-public-sg</code> only, on the app port</li>
+              <li><code>cloud-database-sg</code>: inbound from <code>cloud-private-sg</code> only, on the database port &mdash; nothing else, not even HQ directly</li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p8-5"><label for="p8-5">Create least-privilege IAM roles<span class="task-note">one instance role per tier, each scoped to only what that tier needs</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>IAM &rarr; Roles &rarr; Create role &rarr; AWS service &rarr; EC2</li>
+              <li>Attach only the specific managed policies each tier actually needs (e.g. app tier: read access to one S3 bucket &mdash; not <code>AdministratorAccess</code>)</li>
+              <li>Attach the role to each instance at launch, same as the SSM role back in Phase 1</li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p8-6"><label for="p8-6">Enable CloudWatch metrics &amp; alarms<span class="task-note">this is the "Monitoring" node from the architecture map</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>CloudWatch &rarr; Alarms &rarr; Create alarm &rarr; select an EC2 metric (e.g. CPUUtilization)</li>
+              <li>Set a sensible threshold, attach an SNS topic so you actually get notified</li>
+              <li>Repeat for the VPN tunnel state metric so you know immediately if the branch or cloud link drops</li>
+            </ol></div>
+          </details>
+        </li>
       </ul>
 
-      <div class="subhead">Validation tests</div>
-      <div class="term"><span class="c2">$</span> ssh ec2-user@10.100.2.10 <span class="c1">\\ reachable only via VPN</span><br><span class="c3">#</span> confirm the database port is unreachable from 0.0.0.0/0<br><span class="c3">#</span> confirm CloudWatch shows live EC2 metrics</div>
-    
+      <div class="subhead" style="margin-top:30px;">Validation tests</div>
+      <div class="term"><span class="c2">$</span> ssh via HQ &rarr; app server on 10.100.2.x <span class="c1">\\ reachable only through the tunnel</span><br><span class="c3">#</span> confirm the database port is unreachable from 0.0.0.0/0, and unreachable from HQ directly (only via the app tier)<br><span class="c3">#</span> confirm CloudWatch shows live metrics for both EC2 instances and the VPN tunnel state</div>
+
     </div>
   </div>
 
