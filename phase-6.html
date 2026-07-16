@@ -70,17 +70,107 @@
       </div>
       <div class="why-box"><strong>Why re-key every hour?</strong>A shorter lifetime limits how much traffic is ever encrypted under one key — if a key leaked, the exposure window is capped at 3600 seconds.</div>
 
-      <div class="subhead">Configuration tasks</div>
+      <div class="subhead">How to build this — in PAN-OS, not AWS</div>
+      <p class="lead">This entire phase happens inside the two firewalls' web UIs — nothing here is an AWS resource. Every step gets done <strong>twice</strong>: once on HQ's firewall, once on Branch's, with the addresses mirrored.</p>
+      <div class="why-box"><strong>Two ends, one tunnel</strong>A tunnel needs both sides configured before it comes up. If you only configure HQ, it'll sit there trying to negotiate with a Branch that isn't listening. Do each step below on both firewalls before moving to the next step.</div>
+
       <ul class="check-list" data-phase>
-        <li><input type="checkbox" id="p6-1"><label for="p6-1">Configure the IKE gateway (peer IP, PSK, IKEv2 profile)</label></li>
-        <li><input type="checkbox" id="p6-2"><label for="p6-2">Configure the IPSEC tunnel + traffic selectors</label></li>
-        <li><input type="checkbox" id="p6-3"><label for="p6-3">Bind the tunnel interface to the virtual router</label></li>
-        <li><input type="checkbox" id="p6-4"><label for="p6-4">Test the tunnel — confirm Phase 1 and Phase 2 come up</label></li>
+        <li>
+          <input type="checkbox" id="p6-1"><label for="p6-1">Create an IKE Crypto Profile<span class="task-note">the reusable AES-256 / SHA-256 / DH14 recipe both gateways will reference</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>Log into PAN-OS &rarr; <strong>Network &rarr; Network Profiles &rarr; IKE Crypto</strong> &rarr; Add</li>
+              <li>Name: <code>ike-crypto-aes256</code></li>
+              <li>Encryption: <code>aes-256-cbc</code> &middot; Authentication: <code>sha256</code> &middot; DH Group: <code>group14</code></li>
+              <li>Key Lifetime: <code>8</code> hours (the IKE session itself, separate from the IPSec data lifetime)</li>
+              <li>Repeat identically on the Branch firewall</li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p6-2"><label for="p6-2">Configure the IKE Gateway<span class="task-note">peer IP, pre-shared key, and the crypto profile from step 1</span></label>
+          <div class="step-illustration"><div class="diagram-panel"><svg class="dg" viewBox="0 0 200 150">
+            <rect x="10" y="50" width="80" height="46" rx="6" class="box box-accent"/>
+            <use href="#i-shield" x="18" y="58" width="18" height="18" class="dicon"/>
+            <text x="55" y="88" text-anchor="middle" font-size="8" font-weight="700">HQ Firewall</text>
+            <rect x="110" y="50" width="80" height="46" rx="6" class="box box-accent"/>
+            <use href="#i-shield" x="118" y="58" width="18" height="18" class="dicon"/>
+            <text x="155" y="88" text-anchor="middle" font-size="8" font-weight="700">Branch Firewall</text>
+            <line x1="90" y1="73" x2="110" y2="73" class="wire-vpn"><title>IKE Gateway: each side points at the other's public IP + shared key</title></line>
+            <text x="100" y="65" text-anchor="middle" font-size="14" fill="var(--accent)">&#128273;</text>
+          </svg></div><div class="fcap">Each gateway object points at the other firewall's public IP, with a matching pre-shared key.</div></div>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li><strong>Network &rarr; IKE Gateways</strong> &rarr; Add</li>
+              <li>Name: <code>to-branch</code> (on HQ) / <code>to-hq</code> (on Branch)</li>
+              <li>Version: <strong>IKEv2 only mode</strong></li>
+              <li>Interface: <code>ethernet1/1</code> (the untrust interface) &middot; Local IP Address: this firewall's Elastic IP</li>
+              <li>Peer IP Address Type: <strong>IP</strong> &middot; Peer Address: the <em>other</em> firewall's Elastic IP</li>
+              <li>Pre-shared Key: set the same secret string on both sides &middot; Local/Peer Identification: leave as IP</li>
+              <li>Advanced Options tab &rarr; IKE Crypto Profile: <code>ike-crypto-aes256</code></li>
+              <li>Repeat with addresses swapped on the other firewall</li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p6-3"><label for="p6-3">Create an IPSec Crypto Profile<span class="task-note">AES-256 / SHA-256, 3600 second lifetime — the actual data-encryption recipe</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li><strong>Network &rarr; Network Profiles &rarr; IPSec Crypto</strong> &rarr; Add</li>
+              <li>Name: <code>ipsec-crypto-aes256</code></li>
+              <li>ESP Encryption: <code>aes-256-cbc</code> &middot; Authentication: <code>sha256</code></li>
+              <li>Lifetime: <code>3600</code> seconds</li>
+              <li>Repeat identically on the Branch firewall</li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p6-4"><label for="p6-4">Configure the IPSec Tunnel + traffic selectors<span class="task-note">creates tunnel.1, and defines which subnets are allowed to cross it</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li><strong>Network &rarr; IPSec Tunnels</strong> &rarr; Add</li>
+              <li>Name: <code>to-branch-tunnel</code> (HQ) / <code>to-hq-tunnel</code> (Branch)</li>
+              <li>Tunnel Interface: click the dropdown &rarr; <strong>New Tunnel Interface</strong> &rarr; create <code>tunnel.1</code></li>
+              <li>IKE Gateway: select the gateway from step 2 &middot; IPSec Crypto Profile: select the profile from step 3</li>
+              <li><strong>Proxy IDs</strong> tab &rarr; Add: Local <code>10.10.0.0/16</code>, Remote <code>10.20.0.0/16</code> (HQ) &mdash; reversed on Branch</li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p6-5"><label for="p6-5">Assign the tunnel interface an IP and bind it to the virtual router<span class="task-note">10.255.0.1 on HQ, 10.255.0.2 on Branch</span></label>
+          <div class="step-illustration"><div class="diagram-panel"><svg class="dg" viewBox="0 0 200 150">
+            <rect x="10" y="50" width="80" height="46" rx="6" class="box box-accent"/>
+            <text x="50" y="72" text-anchor="middle" font-size="8" font-weight="700">tunnel.1</text>
+            <text x="50" y="84" text-anchor="middle" class="mono-label label-sub" font-size="7.5">10.255.0.1</text>
+            <rect x="110" y="50" width="80" height="46" rx="6" class="box box-accent"/>
+            <text x="150" y="72" text-anchor="middle" font-size="8" font-weight="700">tunnel.1</text>
+            <text x="150" y="84" text-anchor="middle" class="mono-label label-sub" font-size="7.5">10.255.0.2</text>
+            <line x1="90" y1="73" x2="110" y2="73" class="wire-vpn"/>
+          </svg></div><div class="fcap">A tunnel interface needs its own small /30-style address, same as any other interface.</div></div>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li><strong>Network &rarr; Interfaces &rarr; Tunnel</strong> &rarr; select <code>tunnel.1</code></li>
+              <li>Config tab: Virtual Router = same router as your other interfaces &middot; Security Zone = trust (or a dedicated VPN zone)</li>
+              <li>IPv4 tab: Add &rarr; <code>10.255.0.1/30</code> on HQ, <code>10.255.0.2/30</code> on Branch</li>
+              <li><strong>Network &rarr; Virtual Routers</strong> &rarr; your router &rarr; Static Routes &rarr; add <code>10.20.0.0/16</code> via <code>tunnel.1</code> (HQ) / <code>10.10.0.0/16</code> via <code>tunnel.1</code> (Branch)</li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p6-6"><label for="p6-6">Allow the traffic in the security policy<span class="task-note">a tunnel with no policy behind it still drops everything</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li><strong>Policies &rarr; Security</strong> &rarr; Add</li>
+              <li>Source Zone: Trust &middot; Destination Zone: Trust (or your VPN zone) &middot; Action: Allow</li>
+              <li>Do this on both firewalls &mdash; the tunnel carries the packets, the policy decides whether they're allowed through</li>
+            </ol></div>
+          </details>
+        </li>
       </ul>
 
-      <div class="subhead">Validation tests</div>
-      <div class="term"><span class="c3">#</span> IKE Phase 1 / Phase 2 logs<br><span class="c3">#</span> Tunnel status — expect <span class="c1">up</span><br><span class="c3">#</span> Route table — confirm 10.20.0.0/16 via tunnel.1</div>
-    
+      <div class="subhead" style="margin-top:30px;">Validation tests</div>
+      <div class="term"><span class="c3">#</span> Network &gt; IPSec Tunnels &mdash; Status column should show <span class="c1">green / up</span><br><span class="c2">$</span> show vpn ike-sa <span class="c1">\\ CLI: confirm Phase 1 negotiated</span><br><span class="c2">$</span> show vpn ipsec-sa tunnel to-branch-tunnel <span class="c1">\\ confirm Phase 2 negotiated</span><br><span class="c3">#</span> from a host behind HQ, ping a host behind Branch &mdash; should succeed through the tunnel</div>
+
     </div>
   </div>
 
