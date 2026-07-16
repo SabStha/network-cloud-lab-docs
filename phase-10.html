@@ -50,14 +50,16 @@
   <div class="phase-body phase-body-page">
       <div class="plain"><svg class="icon"><use href="#i-bulb"/></svg><span>In one sentence: <em>everything above, checked off once and collected into one deliverable set.</em></span></div>
 
+      <p class="lead">Nothing here needs to be written from scratch — every deliverable already exists somewhere in the phases you just built. This is the checklist that confirms it, with a link straight to each one.</p>
+
       <ul class="check-list" data-phase>
-        <li><input type="checkbox" id="p10-1"><label for="p10-1">Network Diagrams (v1 → v2 → cloud)</label></li>
-        <li><input type="checkbox" id="p10-2"><label for="p10-2">IP Address Spreadsheet</label></li>
-        <li><input type="checkbox" id="p10-3"><label for="p10-3">Firewall Rule Matrix</label></li>
-        <li><input type="checkbox" id="p10-4"><label for="p10-4">VPN Design Document</label></li>
-        <li><input type="checkbox" id="p10-5"><label for="p10-5">AWS Architecture Diagram</label></li>
-        <li><input type="checkbox" id="p10-6"><label for="p10-6">Terraform Repository</label></li>
-        <li><input type="checkbox" id="p10-7"><label for="p10-7">Troubleshooting Guide</label></li>
+        <li><input type="checkbox" id="p10-1"><label for="p10-1">Network Diagrams (v1 → v2 → cloud)<span class="task-note">live in <a href="phase-1.html">Phase 1</a>, <a href="phase-5.html">Phase 5</a>, and <a href="phase-8.html">Phase 8</a></span></label></li>
+        <li><input type="checkbox" id="p10-2"><label for="p10-2">IP Address Spreadsheet<span class="task-note">the tables across <a href="phase-2.html">Phase 2</a>, <a href="phase-5.html">Phase 5</a>, and <a href="phase-8.html">Phase 8</a></span></label></li>
+        <li><input type="checkbox" id="p10-3"><label for="p10-3">Firewall Rule Matrix<span class="task-note">the security policy table in <a href="phase-3.html">Phase 3</a></span></label></li>
+        <li><input type="checkbox" id="p10-4"><label for="p10-4">VPN Design Document<span class="task-note">the IKE/IPSec parameters and config steps in <a href="phase-6.html">Phase 6</a></span></label></li>
+        <li><input type="checkbox" id="p10-5"><label for="p10-5">AWS Architecture Diagram<span class="task-note">the interactive map on <a href="index.html">the overview page</a>, plus each phase's own diagram</span></label></li>
+        <li><input type="checkbox" id="p10-6"><label for="p10-6">Terraform Repository<span class="task-note">the code from <a href="phase-9.html">Phase 9</a>, in version control</span></label></li>
+        <li><input type="checkbox" id="p10-7"><label for="p10-7">Troubleshooting Guide<span class="task-note">the validation tests at the bottom of every phase — collect the real failures you hit into this</span></label></li>
       </ul>
 
       <div class="why-box" style="margin-top:20px;"><strong>Why this matters</strong>A recruiter skimming a repo sees the difference immediately: configs with no rationale reads as tutorial-following. Requirements → design → IP plan → policy → validation → docs, repeated across eleven phases, reads as how the work actually happened.</div>

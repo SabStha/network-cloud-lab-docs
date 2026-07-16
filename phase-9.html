@@ -57,15 +57,37 @@
         <div class="card"><h4>Compute</h4><ul><li>EC2 instances</li><li>Key pairs</li></ul></div>
       </div>
 
-      <div class="subhead">Configuration tasks</div>
+      <div class="subhead">How to build this — the code, not the clicks</div>
+      <p class="lead">Every task from here on is code, not console steps. This describes the Phase 1 network (HQ's VPC, subnets, IGW) as Terraform — the same pattern extends to the branch and cloud VPCs from Phases 5 and 8.</p>
+
       <ul class="check-list" data-phase>
-        <li><input type="checkbox" id="p9-1"><label for="p9-1">Write <code>main.tf</code> covering VPC, subnets, routes</label></li>
-        <li><input type="checkbox" id="p9-2"><label for="p9-2">Parameterize with <code>variables.tf</code> (CIDRs, region, size)</label></li>
-        <li><input type="checkbox" id="p9-3"><label for="p9-3">Configure remote state (S3 + lock table)</label></li>
-        <li><input type="checkbox" id="p9-4"><label for="p9-4"><code>terraform plan</code> reviewed, then <code>apply</code></label></li>
+        <li>
+          <input type="checkbox" id="p9-1"><label for="p9-1">Write <code>variables.tf</code><span class="task-note">every value that might change between environments, parameterized once</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me the code</summary>
+            <div class="howto-body"><div class="term" style="font-size:11.6px;">variable "region"              { default = "ap-northeast-3" }<br>variable "vpc_cidr"            { default = "10.10.0.0/16" }<br>variable "public_subnet_cidr"  { default = "10.10.1.0/24" }<br>variable "private_subnet_cidr" { default = "10.10.20.0/24" }</div></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p9-2"><label for="p9-2">Write <code>main.tf</code><span class="task-note">the VPC, subnets, and Internet Gateway from Phase 1, described as resources</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me the code</summary>
+            <div class="howto-body"><div class="term" style="font-size:11.2px;">resource "aws_vpc" "hq" {<br>&nbsp;&nbsp;cidr_block = var.vpc_cidr<br>&nbsp;&nbsp;tags = { Name = "enterprise-lab-vpc" }<br>}<br><br>resource "aws_subnet" "public_wan" {<br>&nbsp;&nbsp;vpc_id     = aws_vpc.hq.id<br>&nbsp;&nbsp;cidr_block = var.public_subnet_cidr<br>&nbsp;&nbsp;tags       = { Name = "public-wan" }<br>}<br><br>resource "aws_internet_gateway" "hq" {<br>&nbsp;&nbsp;vpc_id = aws_vpc.hq.id<br>&nbsp;&nbsp;tags   = { Name = "enterprise-lab-igw" }<br>}</div></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p9-3"><label for="p9-3">Configure remote state<span class="task-note">S3 bucket for the state file + a DynamoDB table for locking, so two people can't apply at once</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me the code</summary>
+            <div class="howto-body"><div class="term" style="font-size:11.6px;">terraform {<br>&nbsp;&nbsp;backend "s3" {<br>&nbsp;&nbsp;&nbsp;&nbsp;bucket         = "enterprise-lab-tfstate"<br>&nbsp;&nbsp;&nbsp;&nbsp;key            = "hq/terraform.tfstate"<br>&nbsp;&nbsp;&nbsp;&nbsp;region         = "ap-northeast-3"<br>&nbsp;&nbsp;&nbsp;&nbsp;dynamodb_table = "terraform-locks"<br>&nbsp;&nbsp;}<br>}</div></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p9-4"><label for="p9-4">Run <code>plan</code>, review it, then <code>apply</code><span class="task-note">never apply anything you haven't read first</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me the code</summary>
+            <div class="howto-body"><div class="term" style="font-size:11.6px;"><span class="c2">$</span> terraform init<br><span class="c2">$</span> terraform plan -out=tfplan <span class="c1">\\ read every line before continuing</span><br><span class="c2">$</span> terraform apply tfplan</div></div>
+          </details>
+        </li>
       </ul>
 
-      <div class="subhead">Validation tests</div>
+      <div class="subhead" style="margin-top:30px;">Validation tests</div>
       <div class="term"><span class="c2">$</span> terraform plan <span class="c1">\\ expect no diff after a clean apply — proves it's idempotent</span></div>
     
     </div>
