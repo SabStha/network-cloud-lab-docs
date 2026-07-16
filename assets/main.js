@@ -1,4 +1,10 @@
 (function(){
+  // Highlight the current page in the sidebar
+  var here = location.pathname.split('/').pop() || 'index.html';
+  Array.prototype.slice.call(document.querySelectorAll('.sidebar-nav a')).forEach(function(a){
+    if(a.getAttribute('data-page') === here){ a.classList.add('active'); }
+  });
+
   // Persist checklist state across page visits
   var allBoxes = Array.prototype.slice.call(document.querySelectorAll('.check-list input[type="checkbox"]'));
   allBoxes.forEach(function(cb){
