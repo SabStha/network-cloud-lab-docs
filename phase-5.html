@@ -90,13 +90,133 @@
         </tbody></table>
       </div>
 
-      <div class="subhead">Configuration tasks</div>
+      <div class="subhead">How to build this — AWS lab</div>
+      <p class="lead">The branch isn't a peered or shared network — it's a completely separate, independent VPC, built the same way HQ was in Phase 1. That's the whole point: two real sites only ever meet over the internet through the tunnel, never through a backdoor AWS connection.</p>
+      <div class="why-box"><strong>Why not just peer the two VPCs?</strong>AWS VPC Peering would connect them directly, bypassing the whole reason for a VPN. Two genuinely separate VPCs, joined only by an encrypted tunnel over their public IPs, is what actually proves the site-to-site design works — exactly like two real offices, each with their own ISP.</div>
+
       <ul class="check-list" data-phase>
-        <li><input type="checkbox" id="p5-1"><label for="p5-1">Provision the second Palo Alto for the branch site</label></li>
-        <li><input type="checkbox" id="p5-2"><label for="p5-2">Assign tunnel interface addresses (10.255.0.1 / .2)</label></li>
-        <li><input type="checkbox" id="p5-3"><label for="p5-3">Add a static route to the branch subnet via the tunnel</label></li>
+        <li>
+          <input type="checkbox" id="p5-1"><label for="p5-1">Create the branch VPC<span class="task-note">CIDR 10.20.0.0/16 — a separate VPC, not peered with HQ's</span></label>
+          <div class="step-illustration"><div class="diagram-panel"><svg class="dg" viewBox="0 0 200 150">
+            <rect x="14" y="18" width="172" height="118" rx="10" fill="none" stroke="var(--zone-trust)" stroke-width="2" stroke-dasharray="5 4"><title>Branch VPC — 10.20.0.0/16, completely separate from HQ's</title></rect>
+            <text x="100" y="10" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--zone-trust)">Branch VPC · 10.20.0.0/16</text>
+            <text x="100" y="80" text-anchor="middle" font-size="10" fill="var(--ink-faint)">empty — a second, independent site</text>
+          </svg></div><div class="fcap">A second VPC — not connected to HQ's in any way yet.</div></div>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>AWS Console &rarr; VPC &rarr; Your VPCs &rarr; Create VPC</li>
+              <li>Resources to create: <strong>VPC only</strong></li>
+              <li>Name tag: <code>branch-vpc</code></li>
+              <li>IPv4 CIDR: <code>10.20.0.0/16</code></li>
+              <li>Click <strong>Create VPC</strong></li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p5-2"><label for="p5-2">Create two branch subnets<span class="task-note">public/WAN 10.20.1.0/24, private/LAN 10.20.20.0/24</span></label>
+          <div class="step-illustration"><div class="diagram-panel"><svg class="dg" viewBox="0 0 200 150">
+            <rect x="14" y="18" width="172" height="118" rx="10" fill="none" stroke="var(--zone-trust)" stroke-width="2" stroke-dasharray="5 4"/>
+            <text x="100" y="10" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--zone-trust)">Branch VPC · 10.20.0.0/16</text>
+            <rect x="24" y="46" width="72" height="80" rx="7" class="box" style="stroke:var(--zone-dmz)"/>
+            <text x="60" y="62" text-anchor="middle" font-size="9.5" font-weight="700" fill="var(--zone-dmz)">branch-public</text>
+            <text x="60" y="76" text-anchor="middle" class="mono-label label-sub" font-size="8.5">10.20.1.0/24</text>
+            <rect x="104" y="46" width="72" height="80" rx="7" class="box" style="stroke:var(--zone-server)"/>
+            <text x="140" y="62" text-anchor="middle" font-size="9.5" font-weight="700" fill="var(--zone-server)">branch-private</text>
+            <text x="140" y="76" text-anchor="middle" class="mono-label label-sub" font-size="8.5">10.20.20.0/24</text>
+          </svg></div><div class="fcap">Same pattern as HQ: one room facing the street, one that doesn't.</div></div>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>VPC Console &rarr; Subnets &rarr; Create subnet</li>
+              <li>VPC ID: select <code>branch-vpc</code></li>
+              <li>Subnet 1 &mdash; Name <code>branch-public</code>, IPv4 CIDR <code>10.20.1.0/24</code></li>
+              <li>Add new subnet &mdash; Name <code>branch-private</code>, IPv4 CIDR <code>10.20.20.0/24</code></li>
+              <li>Click <strong>Create subnet</strong></li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p5-3"><label for="p5-3">Attach a second Internet Gateway to the branch VPC<span class="task-note">every VPC needs its own IGW — this one is unrelated to HQ's</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>VPC Console &rarr; Internet Gateways &rarr; Create internet gateway</li>
+              <li>Name tag: <code>branch-igw</code> &rarr; Create</li>
+              <li>Select it &rarr; Actions &rarr; Attach to VPC &rarr; choose <code>branch-vpc</code></li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p5-4"><label for="p5-4">Build the branch route tables<span class="task-note">public RT: 0.0.0.0/0 &rarr; branch IGW. private RT: pending until the branch firewall exists</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>VPC Console &rarr; Route Tables &rarr; Create route table</li>
+              <li><strong>Public:</strong> Name <code>branch-public-rt</code>, VPC <code>branch-vpc</code> &rarr; add route <code>0.0.0.0/0</code> &rarr; Internet Gateway <code>branch-igw</code> &rarr; associate with <code>branch-public</code></li>
+              <li><strong>Private:</strong> Name <code>branch-private-rt</code>, VPC <code>branch-vpc</code> &rarr; associate with <code>branch-private</code>, leave routes for later</li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p5-5"><label for="p5-5">Launch the branch Palo Alto VM-Series firewall<span class="task-note">same AWS Marketplace listing as HQ, same instance size</span></label>
+          <div class="step-illustration"><div class="diagram-panel"><svg class="dg" viewBox="0 0 200 150">
+            <rect x="14" y="18" width="172" height="118" rx="10" fill="none" stroke="var(--zone-trust)" stroke-width="2" stroke-dasharray="5 4"/>
+            <rect x="24" y="42" width="72" height="86" rx="7" class="box" style="stroke:var(--zone-dmz)"/>
+            <text x="60" y="56" text-anchor="middle" font-size="8.5" font-weight="700" fill="var(--zone-dmz)">branch-public</text>
+            <use href="#i-shield" x="48" y="68" width="22" height="22" class="dicon" style="stroke:var(--zone-trust)"><title>branch-palo-alto</title></use>
+            <text x="60" y="106" text-anchor="middle" font-size="8" font-weight="700">branch-palo-alto</text>
+            <rect x="104" y="42" width="72" height="86" rx="7" class="box" style="stroke:var(--zone-server)"/>
+          </svg></div><div class="fcap">A second, fully independent firewall — HQ's config has no idea this one exists yet.</div></div>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>AWS Marketplace &rarr; Palo Alto Networks VM-Series &rarr; Bundle 1 (PAYG) &rarr; Launch through EC2</li>
+              <li>Name: <code>branch-palo-alto</code> &middot; Instance type: same as HQ (e.g. <code>c5n.xlarge</code>)</li>
+              <li>Key pair: create a new one, e.g. <code>branch-palo-alto</code></li>
+              <li>Network settings: VPC <code>branch-vpc</code>, Subnet <code>branch-public</code>, Auto-assign public IP: Enable</li>
+              <li>Security group: new, allow HTTPS(443)/SSH(22) from My IP</li>
+              <li>Launch instance &mdash; allow 15&ndash;45 minutes to fully boot, same as HQ</li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p5-6"><label for="p5-6">Attach 3 network interfaces to the branch firewall<span class="task-note">management, untrust/WAN, trust/LAN — same pattern as HQ</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>EC2 &rarr; Network Interfaces &rarr; Create network interface &rarr; Subnet <code>branch-public</code>, Description <code>branch-untrust-eth1</code>, SG allow-all &rarr; Create</li>
+              <li>Create another &rarr; Subnet <code>branch-private</code>, Description <code>branch-trust-eth2</code>, SG allow-all &rarr; Create</li>
+              <li>Attach both to the <code>branch-palo-alto</code> instance via Actions &rarr; Attach to instance</li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p5-7"><label for="p5-7">Allocate an Elastic IP for the branch untrust interface<span class="task-note">this is the address HQ's tunnel will point at in Phase 6</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>EC2 &rarr; Elastic IPs &rarr; Allocate Elastic IP address</li>
+              <li>Associate it with <code>branch-untrust-eth1</code></li>
+              <li>Write this address down &mdash; you'll need it for the HQ side of the tunnel in Phase 6</li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p5-8"><label for="p5-8">Disable source/destination check on the branch trust interface<span class="task-note">same reason as HQ — required for the firewall to forward traffic</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>EC2 &rarr; Network Interfaces &rarr; select <code>branch-trust-eth2</code></li>
+              <li>Actions &rarr; Change source/destination check &rarr; Stopped &rarr; Save</li>
+            </ol></div>
+          </details>
+        </li>
+        <li>
+          <input type="checkbox" id="p5-9"><label for="p5-9">Open branch security groups<span class="task-note">management SG: your IP only. data-plane SGs: allow all — PAN-OS filters</span></label>
+          <details class="howto"><summary><svg class="hchev" viewBox="0 0 10 10"><path d="M2 1l5 4-5 4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Show me how</summary>
+            <div class="howto-body"><ol>
+              <li>EC2 &rarr; <code>branch-palo-alto</code> &rarr; Security tab &rarr; management SG &rarr; Inbound rules &rarr; add HTTPS(443) and SSH(22) from My IP</li>
+              <li>Untrust/trust SGs: allow all traffic from 0.0.0.0/0 &mdash; same reasoning as HQ</li>
+            </ol></div>
+          </details>
+        </li>
       </ul>
-    
+
+      <div class="why-box"><strong>What's not done yet</strong>Both firewalls now exist independently, each fully able to reach the internet on its own — but they don't know about each other at all. The tunnel interface addresses (10.255.0.1 / 10.255.0.2) and the actual IKE/IPSEC configuration that connects them live entirely inside PAN-OS, not AWS — that's all of Phase 6.</div>
+
     </div>
   </div>
 
