@@ -78,6 +78,29 @@
   <div class="phase-body phase-body-page">
       <div class="plain"><svg class="icon"><use href="#i-bulb"/></svg><span>In one sentence: <em>the AWS environment gets described as text (Terraform) so it can be destroyed and rebuilt identically, on demand.</em></span></div>
 
+      <div class="subhead">Text becomes infrastructure</div>
+      <div class="diagram-panel">
+        <svg class="diagram dg" viewBox="0 0 640 160" width="100%" height="160">
+          <rect x="10" y="55" width="120" height="50" rx="6" class="box" style="stroke:var(--cat-devops)"/>
+          <use href="#i-code" x="24" y="65" width="20" height="20" class="dicon" style="stroke:var(--cat-devops)"/>
+          <text x="70" y="94" text-anchor="middle" font-size="10" font-weight="700">.tf files</text>
+          <line x1="130" y1="80" x2="170" y2="80" class="wire"/>
+          <rect x="170" y="55" width="130" height="50" rx="6" class="box"/>
+          <text x="235" y="76" text-anchor="middle" font-size="10" font-weight="700">terraform</text>
+          <text x="235" y="90" text-anchor="middle" class="mono-label label-sub" font-size="8">plan</text>
+          <line x1="300" y1="80" x2="340" y2="80" class="wire"/>
+          <rect x="340" y="55" width="130" height="50" rx="6" class="box" style="stroke:var(--warn)"/>
+          <text x="405" y="76" text-anchor="middle" font-size="10" font-weight="700">you review it</text>
+          <text x="405" y="90" text-anchor="middle" class="mono-label label-sub" font-size="8">nothing changes yet</text>
+          <line x1="470" y1="80" x2="510" y2="80" class="wire-vpn"/>
+          <rect x="510" y="45" width="120" height="70" rx="6" class="box box-accent"/>
+          <use href="#i-cloud" x="524" y="55" width="20" height="20" class="dicon"/>
+          <text x="570" y="88" text-anchor="middle" font-size="10" font-weight="700">AWS</text>
+          <text x="570" y="102" text-anchor="middle" class="mono-label label-sub" font-size="7.5">apply</text>
+        </svg>
+        <div class="diagram-caption">The only step that changes anything is the last one — and it never runs unread</div>
+      </div>
+
       <div class="subhead">Terraform-managed resources</div>
       <div class="grid grid-3" style="margin-bottom:6px;">
         <div class="card"><h4>Networking</h4><ul><li>VPC</li><li>Subnets</li><li>Route tables</li></ul></div>

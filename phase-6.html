@@ -78,6 +78,27 @@
   <div class="phase-body phase-body-page">
       <div class="plain"><svg class="icon"><use href="#i-bulb"/></svg><span>In one sentence: <em>both firewalls agree on a shared secret (IKE), then use it to scramble every packet that crosses the tunnel (IPSEC).</em></span></div>
 
+      <div class="subhead">What's actually being encrypted</div>
+      <div class="diagram-panel">
+        <svg class="diagram dg" viewBox="0 0 640 220" width="100%" height="220">
+          <rect x="20" y="70" width="170" height="70" rx="8" class="box box-accent"/>
+          <use href="#i-shield" x="34" y="82" width="24" height="24" class="dicon"/>
+          <text x="105" y="115" text-anchor="middle" font-size="12" font-weight="700">HQ Firewall</text>
+          <text x="105" y="130" text-anchor="middle" class="mono-label label-sub">tunnel.1 · 10.255.0.1</text>
+          <rect x="450" y="70" width="170" height="70" rx="8" class="box box-accent"/>
+          <use href="#i-shield" x="464" y="82" width="24" height="24" class="dicon"/>
+          <text x="535" y="115" text-anchor="middle" font-size="12" font-weight="700">Branch Firewall</text>
+          <text x="535" y="130" text-anchor="middle" class="mono-label label-sub">tunnel.1 · 10.255.0.2</text>
+          <use href="#i-tunnel" x="296" y="76" width="48" height="48" class="dicon" style="stroke:var(--accent)"/>
+          <line x1="190" y1="105" x2="290" y2="105" class="wire-vpn"/>
+          <line x1="350" y1="105" x2="450" y2="105" class="wire-vpn"/>
+          <text x="320" y="60" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--accent)">IKEv2 · AES-256 · SHA-256</text>
+          <text x="320" y="165" text-anchor="middle" class="mono-label label-sub">10.10.0.0/16  &#8596;  10.20.0.0/16</text>
+          <text x="320" y="182" text-anchor="middle" font-size="9" fill="var(--ink-faint)">everything inside this pipe is unreadable to anyone on the public internet</text>
+        </svg>
+        <div class="diagram-caption">The tunnel is a logical pipe between two tunnel interfaces — the physical path is still the open internet</div>
+      </div>
+
       <div class="subhead">IKE (Phase 1) parameters</div>
       <div class="grid grid-4" style="margin-bottom:18px;">
         <div class="card"><h4 class="mono">IKEv2</h4><p>Key exchange version — faster rekeying, native MOBIKE.</p></div>

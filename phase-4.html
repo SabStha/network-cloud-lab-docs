@@ -78,6 +78,32 @@
   <div class="phase-body phase-body-page">
       <div class="plain"><svg class="icon"><use href="#i-bulb"/></svg><span>In one sentence: <em>everything designed in Phases 0–3 gets typed into the box, in order, then proven with a real test — not "it looks fine."</em></span></div>
 
+      <div class="subhead">What a working request actually looks like</div>
+      <div class="diagram-panel">
+        <svg class="diagram dg" viewBox="0 0 640 190" width="100%" height="190">
+          <rect x="10" y="60" width="90" height="50" rx="6" class="box"/>
+          <use href="#i-monitor" x="24" y="70" width="20" height="20" class="dicon"/>
+          <text x="55" y="98" text-anchor="middle" font-size="10" font-weight="700">PC-1</text>
+          <line x1="100" y1="85" x2="150" y2="85" class="wire-vpn"/>
+          <rect x="150" y="55" width="140" height="60" rx="6" class="box box-accent"/>
+          <use href="#i-shield" x="162" y="64" width="20" height="20" class="dicon"/>
+          <text x="230" y="95" text-anchor="middle" font-size="10" font-weight="700">Firewall</text>
+          <text x="230" y="107" text-anchor="middle" class="mono-label label-sub" font-size="8">zones · NAT · policy</text>
+          <line x1="290" y1="85" x2="340" y2="85" class="wire-vpn"/>
+          <ellipse cx="390" cy="85" rx="50" ry="20" class="box"/>
+          <use href="#i-cloud" x="372" y="74" width="16" height="16" class="dicon"/>
+          <text x="398" y="90" text-anchor="middle" font-size="10" font-weight="700">Internet</text>
+          <line x1="440" y1="85" x2="480" y2="85" class="wire" stroke-dasharray="3 3"/>
+          <rect x="480" y="30" width="150" height="110" rx="6" class="box" style="stroke:var(--ok)"/>
+          <text x="555" y="48" text-anchor="middle" font-size="9.5" font-weight="700" fill="var(--ok)">Traffic Monitor</text>
+          <text x="495" y="66" font-size="8" font-family="var(--font-mono)" fill="var(--ink-faint)">src   10.10.20.10</text>
+          <text x="495" y="80" font-size="8" font-family="var(--font-mono)" fill="var(--ink-faint)">dst   8.8.8.8</text>
+          <text x="495" y="94" font-size="8" font-family="var(--font-mono)" fill="var(--ink-faint)">zone  trust&#8594;untrust</text>
+          <text x="495" y="112" font-size="9" font-weight="700" fill="var(--ok)">action  allow</text>
+        </svg>
+        <div class="diagram-caption">PC-1's request crosses the firewall, gets NAT'd, and logs an allow — this is the proof, not a guess</div>
+      </div>
+
       <div class="subhead">Configuration tasks — in build order</div>
       <ul class="check-list" data-phase>
         <li><input type="checkbox" id="p4-1"><label for="p4-1">Configure interfaces<span class="task-note">WAN + LAN addresses from the Phase 2 IP plan</span></label></li>

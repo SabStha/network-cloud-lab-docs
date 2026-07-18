@@ -78,6 +78,39 @@
   <div class="phase-body phase-body-page">
       <div class="plain"><svg class="icon"><use href="#i-bulb"/></svg><span>In one sentence: <em>think of an IP range like a street of numbered houses — we're deciding how big each street is before anyone moves in.</em></span></div>
 
+      <div class="subhead">The address plan, top to bottom</div>
+      <div class="diagram-panel">
+        <svg class="diagram dg" viewBox="0 0 640 260" width="100%" height="260">
+          <rect x="240" y="14" width="160" height="42" rx="6" class="box box-accent"/>
+          <text x="320" y="35" text-anchor="middle" font-size="12" font-weight="700">HQ Network</text>
+          <text x="320" y="50" text-anchor="middle" class="mono-label label-sub">10.10.0.0/16</text>
+          <line x1="320" y1="56" x2="320" y2="76" class="wire"/>
+          <line x1="80" y1="76" x2="560" y2="76" class="wire"/>
+          <line x1="80" y1="76" x2="80" y2="96" class="wire"/>
+          <line x1="240" y1="76" x2="240" y2="96" class="wire"/>
+          <line x1="400" y1="76" x2="400" y2="96" class="wire"/>
+          <line x1="560" y1="76" x2="560" y2="96" class="wire"/>
+          <rect x="20" y="96" width="120" height="60" rx="6" class="box" style="stroke:var(--zone-trust)"/>
+          <text x="80" y="120" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--zone-trust)">Management</text>
+          <text x="80" y="136" text-anchor="middle" class="mono-label label-sub">10.10.10.0/24</text>
+          <rect x="180" y="96" width="120" height="60" rx="6" class="box" style="stroke:var(--zone-server)"/>
+          <text x="240" y="120" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--zone-server)">Users</text>
+          <text x="240" y="136" text-anchor="middle" class="mono-label label-sub">10.10.20.0/24</text>
+          <rect x="340" y="96" width="120" height="60" rx="6" class="box" style="stroke:var(--zone-dmz)"/>
+          <text x="400" y="120" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--zone-dmz)">Servers</text>
+          <text x="400" y="136" text-anchor="middle" class="mono-label label-sub">10.10.30.0/24</text>
+          <rect x="500" y="96" width="120" height="60" rx="6" class="box" style="stroke:var(--zone-untrust)"/>
+          <text x="560" y="120" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--zone-untrust)">Guest</text>
+          <text x="560" y="136" text-anchor="middle" class="mono-label label-sub">10.10.40.0/24</text>
+          <line x1="240" y1="14" x2="130" y2="14" class="wire" style="display:none"/>
+          <ellipse cx="320" cy="200" rx="90" ry="18" class="box"/>
+          <use href="#i-router" x="298" y="192" width="16" height="16" class="dicon"/>
+          <text x="336" y="204" text-anchor="middle" font-size="10.5" font-weight="700">WAN link</text>
+          <text x="320" y="228" text-anchor="middle" class="mono-label label-sub">203.0.113.0/30 — point-to-point, 2 usable addresses</text>
+        </svg>
+        <div class="diagram-caption">One /16 for the whole HQ, split into four /24s by function</div>
+      </div>
+
       <div class="subhead">WAN link</div>
       <div class="why-box"><strong>Why a /30 here?</strong>This link only ever has two devices on it — the ISP router and the firewall. A /30 gives exactly 2 usable addresses, no wasted space.</div>
       <div class="table-wrap" style="margin-bottom:20px;">
