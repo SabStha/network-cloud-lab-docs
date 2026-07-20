@@ -361,6 +361,10 @@
               <li>Click <strong>Commit</strong> again &mdash; nothing above takes effect until you commit</li>
             </ol></div>
           </details>
+          <div class="why-box"><strong>Two more traps, learned live</strong>
+            <p style="margin:6px 0;">1) If you attach a network interface to the firewall <em>after</em> it's already running (not at launch), a Commit alone won't make PAN-OS notice it — you need a full <strong>Device &rarr; Setup &rarr; Operations &rarr; Reboot Device</strong> for it to detect the new hardware. Its DHCP will sit stuck at "Selecting" forever until you reboot, no matter how many times you re-check the config.</p>
+            <p style="margin:6px 0 0;">2) PAN-OS won't let you delete or reassign a zone while a NAT or Security rule still references it. If your zones end up on the wrong interfaces (easy to do — nothing stops you from creating <code>ethernet1/1: untrust</code> and <code>ethernet1/2: trust</code> by mistake, which is backwards), you have to <strong>delete the dependent NAT/Security rules first</strong>, fix the zone assignments, then recreate those rules. Don't panic if a rule refuses to delete — check what zone it's still pointing at.</p>
+          </div>
         </li>
         <li>
           <input type="checkbox" id="p1-11"><label for="p1-11">Create an IAM role for PC-1: <code>AmazonSSMManagedInstanceCore</code><span class="task-note">without this attached, Session Manager can't reach PC-1 at all — create it before the next step, not after</span></label>
