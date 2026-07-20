@@ -108,6 +108,8 @@
 
       <div class="why-box"><strong>Where did the ISP router go?</strong>In AWS you don't deploy an "ISP router" yourself — an Internet Gateway (IGW) attached to your VPC plays that role. It isn't your home/office internet router either; that's outside this topology entirely, it's just how your laptop reaches the AWS Console. The IGW is virtual, free, and needed from the very start of Phase 1 — without it the VPC has no path to the internet at all, so nothing else in this phase can be tested.</div>
 
+      <div class="why-box"><strong>Validate PC-1 itself before validating the NAT path</strong>A multi-hour debugging session on 2026-07-20 (see the note near the end of this checklist) never found a definitive root cause for PC-1 failing to reach the internet through the firewall — every piece of AWS and PAN-OS config checked out correct, repeatedly, on two separate fresh instances. A clean rebuild fixed it, but the actual cause stayed unknown. The lesson: when you launch PC-1, before switching it to the fully private design, temporarily give it a public IP and a security group scoped to just your own IP, and confirm you can reach it directly (RDP for Windows, SSH for Linux). Once that's proven healthy, remove the public IP and switch to the private/NAT'd path from the task list below. This separates two very different failure modes — "the instance itself is broken" vs. "the network path to it is broken" — which otherwise look identical from the outside and are much harder to tell apart once both the public IP and your only diagnostic tool (Session Manager) depend on the same unproven path.</div>
+
       <div class="table-wrap" style="margin:14px 0 18px;">
         <table><thead><tr><th>Diagram box</th><th>AWS resource</th></tr></thead>
         <tbody>
@@ -414,6 +416,11 @@
 
       <div class="subhead" style="margin-top:26px;">Validation tests</div>
       <div class="term"><span class="c2">$</span> aws ssm start-session --target &lt;PC-1 instance-id&gt; <span class="c1">\\ from your laptop, via your own AWS login</span><br><span class="c2">$</span> ping 8.8.8.8 <span class="c1">\\ run from inside that session, on PC-1</span><br><span class="c3">#</span> confirm the request shows up in PAN-OS Traffic Monitor as <span class="c1">allow</span></div>
+
+      <div class="why-box"><strong>Post-mortem (2026-07-20) — if this still doesn't work after everything above looks correct</strong>
+        <p style="margin:6px 0;">On a real build, PC-1's SSM Agent failed to register for hours with a plain connection timeout to AWS's SSM endpoint — no firewall error, no AWS error, just silence. Here's everything that was checked and confirmed <em>correct</em>, in case you hit the same wall: the AWS route table, security groups (both inbound and outbound), Network ACLs, source/dest check on the trust interface, the PAN-OS zone assignments, the NAT rule (confirmed via <code>test nat-policy-match</code>), the security policy (confirmed via <code>test security-policy-match</code>), and a live ping test sourced from the firewall's own untrust interface, which succeeded. Windows Firewall was disabled entirely via injected user data — no change. A second, completely fresh PC-1 instance hit the identical wall. None of that found the actual cause.</p>
+        <p style="margin:6px 0 0;">What fixed it: a full teardown and rebuild of the VPC, firewall, and PC-1 from scratch. Sometimes a system accumulates enough manual live-patching (interface swaps, deleted-and-recreated NAT rules, multiple reboots) that it's genuinely faster to rebuild clean than to keep auditing it. If you've verified every item above and it's still not working, this is a legitimate next step, not a last resort you should feel bad about reaching for.</p>
+      </div>
 
       <div class="subhead" style="margin-top:30px;">Your build, illustrated</div>
       <p class="lead">If "VPC" and "subnet" still feel abstract, here's the plain-English version, then a picture of what you've actually built so far.</p>
