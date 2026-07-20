@@ -269,6 +269,7 @@
         </li>
         <li>
           <input type="checkbox" id="p1-7"><label for="p1-7">Allocate an Elastic IP and associate it with the untrust interface<span class="task-note">this stands in for 203.0.113.2 from the design — AWS assigns the real public address</span></label>
+          <div class="why-box"><strong>You actually need two Elastic IPs, for two different jobs</strong>One goes on the <strong>management</strong> interface (the one created automatically back in Step 5) so <em>you</em> can reach the PAN-OS GUI — the "Auto-assign public IP" from launch gives you something temporary, but it isn't stable across a stop/start, so allocate a real Elastic IP for it too. A separate, second Elastic IP goes on the <strong>untrust</strong> interface you're creating in this step, so the <em>firewall's own NAT'd traffic</em> can reach the internet. Don't try to reuse one EIP for both — associate each with its own interface. Also: to reach the GUI, browse straight to <code>https://&lt;the management EIP&gt;</code> — "EC2 Instance Connect" in the console is for SSH into Linux shells and doesn't apply here at all.</div>
           <div class="step-illustration"><div class="diagram-panel"><svg class="dg" viewBox="0 0 200 150">
             <rect x="14" y="18" width="172" height="118" rx="10" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 4"/>
             <rect x="24" y="34" width="72" height="94" rx="7" class="box" style="stroke:var(--zone-dmz)"/>
