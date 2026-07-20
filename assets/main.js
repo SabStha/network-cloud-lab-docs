@@ -97,17 +97,25 @@
     });
   });
 
-  // Scroll-reveal
-  var revealTargets = Array.prototype.slice.call(document.querySelectorAll('.page-card, .phase-nav-card, .kpi, .group-heading'));
-  revealTargets.forEach(function(el){ el.classList.add('reveal'); });
-  if('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-    var ro = new IntersectionObserver(function(entries){
-      entries.forEach(function(e){
-        if(e.isIntersecting){ e.target.classList.add('visible'); ro.unobserve(e.target); }
-      });
-    }, { threshold:0.08, rootMargin:'0px 0px -40px 0px' });
-    revealTargets.forEach(function(el){ ro.observe(el); });
-  } else {
-    revealTargets.forEach(function(el){ el.classList.add('visible'); });
+  // Scroll-reveal — defensive: content must never stay invisible if this fails or is slow
+  try {
+    var revealTargets = Array.prototype.slice.call(document.querySelectorAll('.page-card, .phase-nav-card, .kpi, .group-heading'));
+    revealTargets.forEach(function(el){ el.classList.add('reveal'); });
+    if('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      var ro = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if(e.isIntersecting){ e.target.classList.add('visible'); ro.unobserve(e.target); }
+        });
+      }, { threshold:0.08, rootMargin:'0px 0px -40px 0px' });
+      revealTargets.forEach(function(el){ ro.observe(el); });
+    } else {
+      revealTargets.forEach(function(el){ el.classList.add('visible'); });
+    }
+    // Safety net: whatever happens above, force everything visible shortly after load
+    setTimeout(function(){
+      revealTargets.forEach(function(el){ el.classList.add('visible'); });
+    }, 1200);
+  } catch(e) {
+    Array.prototype.slice.call(document.querySelectorAll('.reveal')).forEach(function(el){ el.classList.add('visible'); });
   }
 })();
